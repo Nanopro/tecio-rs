@@ -8,4 +8,4 @@ description = "Rust simple binding for Tecplot tecio library."
 license = "GPL-3.0"
 
 [dependencies]
-libc = "*"
+libc = "0.2.51"
