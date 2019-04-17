@@ -22,6 +22,9 @@ pub struct TecZone{
     pub name: String, 
     pub zone_type: ZoneType,
     pub id: i32,
+    pub i_max: i64,
+    pub j_max: i64,
+    pub k_max: i64,
 }
 
 
@@ -113,10 +116,29 @@ impl TecReader{
                     });
                 }
             };
+
+            let mut i_max: i64 = 0;
+            let mut j_max: i64 = 0;
+            let mut k_max: i64 = 0;
+            er = unsafe{
+                bindings::tecZoneGetIJK(file_handle, i, &mut i_max, &mut j_max, &mut k_max)
+            };
+            if er != 0{
+                return Err(TecioError{
+                    message: format!("Error reading zone IJK, num = {}.", i),
+                    code: er,
+                });
+            }
+
+
+
             zones.push(TecZone{
                 name: name.into_string().unwrap(),
                 zone_type: zone_type,
                 id: i as i32,
+                i_max: i_max as i64,
+                j_max: j_max as i64,
+                k_max: k_max as i64,
             });
         }
         
