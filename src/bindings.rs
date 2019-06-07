@@ -2,6 +2,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(unused)]
 
 pub const _INTTYPES_H: u32 = 1;
 pub const _FEATURES_H: u32 = 1;

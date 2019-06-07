@@ -21,6 +21,7 @@ pub struct TecReader{
 pub struct TecZone{
     pub name: String, 
     pub zone_type: ZoneType,
+    pub time: f64,
     pub id: i32,
     pub i_max: i64,
     pub j_max: i64,
@@ -130,11 +131,22 @@ impl TecReader{
                 });
             }
 
+            let mut time: f64 = 0.0;
+            er = unsafe{
+                bindings::tecZoneGetSolutionTime(file_handle, i, &mut time)
+            };
+            if er != 0{
+                return Err(TecioError{
+                    message: format!("Error reading zone solution time, num = {}.", i),
+                    code: er,
+                });
+            }
 
 
             zones.push(TecZone{
                 name: name.into_string().unwrap(),
                 zone_type: zone_type,
+                time,
                 id: i as i32,
                 i_max: i_max as i64,
                 j_max: j_max as i64,
