@@ -1,6 +1,6 @@
 [package]
 name = "tecio"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Nanopro <nanopro1g@gmail.com>"]
 edition = "2018"
 build = "build.rs"
