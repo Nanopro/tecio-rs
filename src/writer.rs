@@ -38,14 +38,15 @@ impl TecWriter{
             )
         };
 
-        er = unsafe{bindings::tecFileSetDiagnosticsLevel(file_handle, 1)};
+        /*er = unsafe{bindings::tecFileSetDiagnosticsLevel(file_handle, 1)};
 
         if er != 0{
             return Err(TecioError{
                 message:"Error opening file.".to_owned(),
                 code: er,
             });
-        }
+        }*/
+
         Ok(Self{
             file_handle,
 

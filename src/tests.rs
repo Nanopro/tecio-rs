@@ -6,8 +6,8 @@ use crate::*;
 fn test_open_1(){
     let r = TecReader::open("test.szplt").unwrap();
     for z in &r.zones{
-        assert_eq!(z.name, "K=    1");
-        assert_eq!(z.zone_type, ZoneType::Ordered);
+        assert_eq!(z.name(), "K=    1");
+        assert_eq!(z.zone_type(), ZoneType::Ordered);
     }
 } 
 

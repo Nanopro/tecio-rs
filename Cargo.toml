@@ -1,6 +1,6 @@
 [package]
 name = "tecio"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Nanopro <nanopro1g@gmail.com>"]
 edition = "2018"
 build = "build.rs"
@@ -9,3 +9,5 @@ license = "GPL-3.0"
 
 [dependencies]
 libc = "0.2.51"
+
+

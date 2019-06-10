@@ -1,8 +1,12 @@
 
+
+
+
+mod common;
 mod bindings;
 mod reader;
 mod writer;
-mod common;
+
 
 #[cfg(test)]
 mod tests;
