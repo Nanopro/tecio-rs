@@ -15,7 +15,10 @@ pub struct TecReader{
     pub zones: Vec<TecZone>,
 }
 
-
+pub enum TecDataType{
+    F32,
+    F64,
+}
 
 
 macro_rules! try_err {
@@ -190,6 +193,26 @@ impl TecReader{
                 dataset,
             })
 
+        }
+    }
+
+
+    pub fn get_data_type(&self, zone_id: i32, var_id: i32) -> Result<TecDataType>{
+        let mut is_enabled = 0;
+        unsafe {try_err(bindings::tecVarIsEnabled(self.file_handle, var_id, &mut is_enabled), format!("Var {} is not enabled.", var_id))};
+
+
+        let mut data_type = 0;
+        unsafe {try_err(bindings::tecZoneVarGetType(self.file_handle,zone_id, var_id, &mut data_type), format!("Cannot load var's {} data type.", var_id))    };
+
+
+        match data_type{
+            2 => Ok(TecDataType::F32),
+            1 => Ok(TecDataType::F64),
+            _ =>  Err(TecioError{
+                message: format!("Unknown data type for var {}", var_id),
+                code: -1,
+            })
         }
     }
 
