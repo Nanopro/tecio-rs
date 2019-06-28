@@ -22,7 +22,10 @@ pub enum ZoneType{
     FEPolyhedron = 7,
 }
 
-
+pub enum TecDataType{
+    F32,
+    F64,
+}
 
 /*pub struct TecZone{
     pub name: String,

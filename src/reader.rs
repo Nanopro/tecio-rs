@@ -5,7 +5,7 @@ use std::convert::From;
 use crate::{bindings, ClassicFEZone};
 
 
-use crate::common::{Dataset, TecZone, ZoneType, TecioError, Result, try_err, OrderedZone};
+use crate::common::{Dataset, TecZone, ZoneType, TecioError, Result, try_err, OrderedZone, TecDataType};
 use std::marker::PhantomData;
 
 
@@ -15,10 +15,7 @@ pub struct TecReader{
     pub zones: Vec<TecZone>,
 }
 
-pub enum TecDataType{
-    F32,
-    F64,
-}
+
 
 
 macro_rules! try_err {
