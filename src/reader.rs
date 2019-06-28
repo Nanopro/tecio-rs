@@ -211,6 +211,31 @@ impl TecReader{
         unsafe{vec.set_len(num_values as usize)};
         Ok(vec)
     }
+
+    pub fn get_data_f64(&self, zone_id: i32, var_id: i32) -> Result<Vec<f64>>{
+        let mut num_values = -1;
+        unsafe {try_err(bindings::tecZoneVarGetNumValues(self.file_handle, zone_id, var_id, &mut num_values), format!("Cannot get num values for var = {}.", var_id))};
+
+        let mut is_enabled = 0;
+        unsafe {try_err(bindings::tecVarIsEnabled(self.file_handle, var_id, &mut is_enabled), format!("Var {} is not enabled.", var_id))};
+        //println!("Is enabled: {}", is_enabled);
+
+
+
+        let mut vec = Vec::with_capacity(num_values as usize);
+        //assert_ne!(num_values, 0);
+
+        unsafe{ try_err(bindings::tecZoneVarGetDoubleValues(self.file_handle, zone_id, var_id, 1, num_values, vec.as_mut_ptr()), format!("Cannot get F64 values for var = {} of zone = {}.", var_id, zone_id))};
+
+        unsafe{vec.set_len(num_values as usize)};
+        Ok(vec)
+    }
+
+
+
+
+
+
     pub fn get_connectivity(&self, zone_id: i32) -> Result<Vec<u32>>{
         let mut i_max: i64 = 0;
         let mut j_max: i64 = 0;
