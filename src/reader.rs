@@ -202,10 +202,10 @@ impl TecReader{
         let mut data_type = 0;
         unsafe {try_err(bindings::tecZoneVarGetType(self.file_handle,zone_id, var_id, &mut data_type), format!("Cannot load var's {} data type.", var_id))    };
 
-
+        println!("{}", data_type);
         match data_type{
-            2 => Ok(TecDataType::F32),
-            1 => Ok(TecDataType::F64),
+            1 => Ok(TecDataType::F32),
+            2 => Ok(TecDataType::F64),
             _ =>  Err(TecioError{
                 message: format!("Unknown data type for var {}", var_id),
                 code: -1,
