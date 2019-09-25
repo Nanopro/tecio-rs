@@ -202,7 +202,7 @@ impl TecReader{
         let mut data_type = 0;
         unsafe {try_err(bindings::tecZoneVarGetType(self.file_handle,zone_id, var_id, &mut data_type), format!("Cannot load var's {} data type.", var_id))    };
 
-        println!("{}", data_type);
+
         match data_type{
             1 => Ok(TecDataType::F32),
             2 => Ok(TecDataType::F64),
@@ -289,7 +289,7 @@ impl TecReader{
         }
 
         unsafe{ vec = Vec::from_raw_parts(buffer_ind, num_connections as usize, num_connections as usize) };
-        println!("{}",vec.len());
+
 
         Ok(vec)
     }

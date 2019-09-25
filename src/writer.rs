@@ -8,7 +8,7 @@ use crate::common::{ZoneType, TecioError, Result};
 
 pub struct TecWriter{
     file_handle: *mut c_void,
-
+    num_vars: usize,
 }
 
 
@@ -16,8 +16,9 @@ pub struct TecWriter{
 
 
 impl TecWriter{
-    pub fn create<T>(file: T, dataset_title:T,var_list:T) -> Result<Self>
+    pub fn create<T>(file: T, dataset_title:T,var_list:T, num_vars: usize,) -> Result<Self>
         where T: Into<Vec<u8>>{
+
         let cname = CString::new::<T>(file)?;
         let dataset_title = CString::new::<T>(dataset_title)?;
         let var_list = CString::new::<T>(var_list)?;
@@ -32,24 +33,31 @@ impl TecWriter{
                 var_list.as_ptr(),
                 1, //szplt
                 0, //fullfile
-                2, //default --- float
+                1, //default --- float
                 null_mut(),
                 &mut file_handle,
             )
         };
-
-        /*er = unsafe{bindings::tecFileSetDiagnosticsLevel(file_handle, 1)};
 
         if er != 0{
             return Err(TecioError{
                 message:"Error opening file.".to_owned(),
                 code: er,
             });
-        }*/
+        }
+
+       // er = unsafe{bindings::tecFileSetDiagnosticsLevel(file_handle, 1)};
+
+        if er != 0{
+            return Err(TecioError{
+                message:"Error opening file.".to_owned(),
+                code: er,
+            });
+        }
 
         Ok(Self{
             file_handle,
-
+            num_vars
         })
 
 
@@ -62,10 +70,11 @@ impl TecWriter{
         let title = CString::new::<T>(title)?;
         let mut zone = 0;
 
-        let var_types = vec![2,2,2,2i32];
-        let var_share = vec![0,0,0,0i32];
-        let passive_var_list = vec![0,0,0,0i32];
-        let value_locs = vec![1,1,1,1i32];
+        let var_types = (0..self.num_vars).map(|_| 1).collect::<Vec<_>>();
+        let var_share = (0..self.num_vars).map(|_| 0).collect::<Vec<_>>();
+        let passive_var_list = (0..self.num_vars).map(|_| 0).collect::<Vec<_>>();
+        let value_locs = (0..self.num_vars).map(|_| 1).collect::<Vec<_>>();
+
 
         let mut er =  unsafe{
             bindings::tecZoneCreateFE(
