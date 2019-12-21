@@ -1,0 +1,3 @@
+[submodule "build/tecio-src"]
+	path = build/tecio-src
+	url = https://gitlab.com/nanopro/tecio-src

@@ -3,11 +3,18 @@ name = "tecio"
 version = "0.3.0"
 authors = ["Nanopro <nanopro1g@gmail.com>"]
 edition = "2018"
-build = "build.rs"
 description = "Rust simple binding for Tecplot tecio library."
 license = "GPL-3.0"
+build = "build/build.rs"
 
 [dependencies]
 libc = "0.2.51"
 
+[build-dependencies.cmake]
+version = "0.1.42"
+optional = true
 
+[features]
+link_static = ["cmake"]
+link_dynamic = []
+default = ["link_dynamic"]
