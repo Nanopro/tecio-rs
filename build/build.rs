@@ -1,4 +1,4 @@
-
+use std::env;
 
 
 fn main() {
@@ -22,12 +22,14 @@ fn main() {
         let mut lib_path = config.build();
 
 
-        lib_path.push("lib");
+        emit_std_cpp_link();
         println!("cargo:warning=Asked to build from source");
+        println!("cargo:warning=Linking to {}", lib_path.display());
         println!("cargo:rustc-link-search=native={}", lib_path.display());
         println!("cargo:rustc-link-lib=static=tecio");
+        
     }
-    #[cfg(feature = "link_dynamic")]
+    #[cfg(not(feature = "link_static"))]
     {
         println!("cargo:warning=Asked to link dynamicly");
         println!("cargo:rustc-link-lib=dylib=tecio");
@@ -35,3 +37,16 @@ fn main() {
 
 }
 
+fn emit_std_cpp_link() {
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let target_env = env::var("CARGO_CFG_TARGET_ENV").unwrap();
+
+    match (target_os.as_str(), target_env.as_str()) {
+        ("linux", _) | ("windows", "gnu") => println!("cargo:rustc-link-lib=dylib=stdc++"),
+        ("macos", _) => println!("cargo:rustc-link-lib=dylib=c++"),
+        ("windows", _) =>println!("cargo:rustc-link-lib=dylib=user32"),
+        _ => {
+            println!("cargo:warning=Failed to link with stdc++");
+        }
+    }
+}

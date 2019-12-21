@@ -17,4 +17,4 @@ optional = true
 [features]
 link_static = ["cmake"]
 link_dynamic = []
-default = ["link_dynamic"]
+default = []
