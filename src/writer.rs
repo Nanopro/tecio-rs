@@ -16,8 +16,8 @@ pub struct TecWriter{
 
 
 impl TecWriter{
-    pub fn create<T>(file: T, dataset_title:T,var_list:T, num_vars: usize,) -> Result<Self>
-        where T: AsRef<&[u8]>{
+    pub fn create<'a, T>(file: T, dataset_title:T,var_list:T, num_vars: usize,) -> Result<Self>
+        where T: AsRef<&'a [u8]>{
 
         let cname = CString::new::<T>(file)?;
         let dataset_title = CString::new::<T>(dataset_title)?;
@@ -65,8 +65,8 @@ impl TecWriter{
 
 
 
-    pub fn add_fe_zone<T>(&mut self, title: T, zone_type: ZoneType, nodes: i64, cells: i64, time: f64, strand_id: i32) -> Result<i32>
-        where T: AsRef<&[u8]>{
+    pub fn add_fe_zone<'a, T>(&mut self, title: T, zone_type: ZoneType, nodes: i64, cells: i64, time: f64, strand_id: i32) -> Result<i32>
+        where T: AsRef<&'a [u8]>{
         let title = CString::new::<T>(title)?;
         let mut zone = 0;
 
