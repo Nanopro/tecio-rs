@@ -16,12 +16,12 @@ pub struct TecWriter{
 
 
 impl TecWriter{
-    pub fn create<'a, T>(file: T, dataset_title:T,var_list:T, num_vars: usize,) -> Result<Self>
-        where T: AsRef<&'a [u8]>{
+    pub fn create<T>(file: T, dataset_title:T,var_list:T, num_vars: usize,) -> Result<Self>
+        where T: AsRef<[u8]>{
 
-        let cname = CString::new::<T>(file)?;
-        let dataset_title = CString::new::<T>(dataset_title)?;
-        let var_list = CString::new::<T>(var_list)?;
+        let cname = CString::new(file.as_ref())?;
+        let dataset_title = CString::new(dataset_title.as_ref())?;
+        let var_list = CString::new(var_list.as_ref())?;
 
         let mut file_handle = null_mut();
 
@@ -65,9 +65,9 @@ impl TecWriter{
 
 
 
-    pub fn add_fe_zone<'a, T>(&mut self, title: T, zone_type: ZoneType, nodes: i64, cells: i64, time: f64, strand_id: i32) -> Result<i32>
-        where T: AsRef<&'a [u8]>{
-        let title = CString::new::<T>(title)?;
+    pub fn add_fe_zone<T>(&mut self, title: T, zone_type: ZoneType, nodes: i64, cells: i64, time: f64, strand_id: i32) -> Result<i32>
+        where T: AsRef<[u8]>{
+        let title = CString::new(title.as_ref())?;
         let mut zone = 0;
 
         let var_types = (0..self.num_vars).map(|_| 1).collect::<Vec<_>>();
