@@ -1,6 +1,6 @@
 [package]
 name = "tecio"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Nanopro <nanopro1g@gmail.com>"]
 edition = "2018"
 description = "Rust simple binding for Tecplot tecio library."

@@ -1,40 +1,30 @@
 use std::env;
 
-
 fn main() {
     #[cfg(all(feature = "link_static"))]
     {
-
         //println!("cargo:rustc-link-search=native=tecio");
         //println!("cargo:rustc-link-lib=static=my_c_lib");
         //println!("cargo:rustc-env=RUST_BACKTRACE=1");
 
-
         use cmake::*;
         let mut config = cmake::Config::new("build/tecio-src");
 
-
-        config
-            .profile("Release")
-            .generator("Ninja");
-
+        config.profile("Release").generator("Ninja");
 
         let mut lib_path = config.build();
-
 
         emit_std_cpp_link();
         println!("cargo:warning=Asked to build from source");
         println!("cargo:warning=Linking to {}", lib_path.display());
         println!("cargo:rustc-link-search=native={}", lib_path.display());
         println!("cargo:rustc-link-lib=static=tecio");
-        
     }
     #[cfg(not(feature = "link_static"))]
     {
         println!("cargo:warning=Asked to link dynamicly");
         println!("cargo:rustc-link-lib=dylib=tecio");
     }
-
 }
 
 fn emit_std_cpp_link() {
@@ -44,7 +34,7 @@ fn emit_std_cpp_link() {
     match (target_os.as_str(), target_env.as_str()) {
         ("linux", _) | ("windows", "gnu") => println!("cargo:rustc-link-lib=dylib=stdc++"),
         ("macos", _) => println!("cargo:rustc-link-lib=dylib=c++"),
-        ("windows", _) =>println!("cargo:rustc-link-lib=dylib=user32"),
+        ("windows", _) => println!("cargo:rustc-link-lib=dylib=user32"),
         _ => {
             println!("cargo:warning=Failed to link with stdc++");
         }

@@ -1,53 +1,13 @@
-
-
-
-
-mod common;
 mod bindings;
+mod common;
+
 mod reader;
-mod writer;
-
-
 #[cfg(test)]
 mod tests;
+mod writer;
 
 extern crate libc;
 
-
-
 pub use common::*;
 pub use reader::TecReader;
-pub use writer::TecWriter;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+pub use writer::{TecWriter, TecZoneWriter, WriterConfig};

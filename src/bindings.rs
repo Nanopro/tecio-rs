@@ -276,13 +276,32 @@ pub type __pid_t = ::std::os::raw::c_int;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct __fsid_t { pub __val: [::std::os::raw::c_int; 2usize] }
+pub struct __fsid_t {
+    pub __val: [::std::os::raw::c_int; 2usize],
+}
 
 #[test]
 fn bindgen_test_layout___fsid_t() {
-    assert_eq!(::std::mem::size_of::<__fsid_t>(), 8usize, concat!( "Size of: " , stringify ! ( __fsid_t ) ));
-    assert_eq!(::std::mem::align_of::<__fsid_t>(), 4usize, concat!( "Alignment of " , stringify ! ( __fsid_t ) ));
-    assert_eq!(unsafe { &(*(::std::ptr::null::<__fsid_t>())).__val as *const _ as usize }, 0usize, concat!( "Offset of field: " , stringify ! ( __fsid_t ) , "::" , stringify ! ( __val ) ));
+    assert_eq!(
+        ::std::mem::size_of::<__fsid_t>(),
+        8usize,
+        concat!("Size of: ", stringify!(__fsid_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<__fsid_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(__fsid_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<__fsid_t>())).__val as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(__fsid_t),
+            "::",
+            stringify!(__val)
+        )
+    );
 }
 
 pub type __clock_t = ::std::os::raw::c_long;
@@ -334,27 +353,84 @@ pub type __gwchar_t = ::std::os::raw::c_int;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct imaxdiv_t { pub quot: ::std::os::raw::c_long, pub rem: ::std::os::raw::c_long }
+pub struct imaxdiv_t {
+    pub quot: ::std::os::raw::c_long,
+    pub rem: ::std::os::raw::c_long,
+}
 
 #[test]
 fn bindgen_test_layout_imaxdiv_t() {
-    assert_eq!(::std::mem::size_of::<imaxdiv_t>(), 16usize, concat!( "Size of: " , stringify ! ( imaxdiv_t ) ));
-    assert_eq!(::std::mem::align_of::<imaxdiv_t>(), 8usize, concat!( "Alignment of " , stringify ! ( imaxdiv_t ) ));
-    assert_eq!(unsafe { &(*(::std::ptr::null::<imaxdiv_t>())).quot as *const _ as usize }, 0usize, concat!( "Offset of field: " , stringify ! ( imaxdiv_t ) , "::" , stringify ! ( quot ) ));
-    assert_eq!(unsafe { &(*(::std::ptr::null::<imaxdiv_t>())).rem as *const _ as usize }, 8usize, concat!( "Offset of field: " , stringify ! ( imaxdiv_t ) , "::" , stringify ! ( rem ) ));
+    assert_eq!(
+        ::std::mem::size_of::<imaxdiv_t>(),
+        16usize,
+        concat!("Size of: ", stringify!(imaxdiv_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<imaxdiv_t>(),
+        8usize,
+        concat!("Alignment of ", stringify!(imaxdiv_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<imaxdiv_t>())).quot as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(imaxdiv_t),
+            "::",
+            stringify!(quot)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<imaxdiv_t>())).rem as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(imaxdiv_t),
+            "::",
+            stringify!(rem)
+        )
+    );
 }
 
-extern "C" { pub fn imaxabs(__n: intmax_t) -> intmax_t; }
+extern "C" {
+    pub fn imaxabs(__n: intmax_t) -> intmax_t;
+}
 
-extern "C" { pub fn imaxdiv(__numer: intmax_t, __denom: intmax_t) -> imaxdiv_t; }
+extern "C" {
+    pub fn imaxdiv(__numer: intmax_t, __denom: intmax_t) -> imaxdiv_t;
+}
 
-extern "C" { pub fn strtoimax(__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char, __base: ::std::os::raw::c_int) -> intmax_t; }
+extern "C" {
+    pub fn strtoimax(
+        __nptr: *const ::std::os::raw::c_char,
+        __endptr: *mut *mut ::std::os::raw::c_char,
+        __base: ::std::os::raw::c_int,
+    ) -> intmax_t;
+}
 
-extern "C" { pub fn strtoumax(__nptr: *const ::std::os::raw::c_char, __endptr: *mut *mut ::std::os::raw::c_char, __base: ::std::os::raw::c_int) -> uintmax_t; }
+extern "C" {
+    pub fn strtoumax(
+        __nptr: *const ::std::os::raw::c_char,
+        __endptr: *mut *mut ::std::os::raw::c_char,
+        __base: ::std::os::raw::c_int,
+    ) -> uintmax_t;
+}
 
-extern "C" { pub fn wcstoimax(__nptr: *const __gwchar_t, __endptr: *mut *mut __gwchar_t, __base: ::std::os::raw::c_int) -> intmax_t; }
+extern "C" {
+    pub fn wcstoimax(
+        __nptr: *const __gwchar_t,
+        __endptr: *mut *mut __gwchar_t,
+        __base: ::std::os::raw::c_int,
+    ) -> intmax_t;
+}
 
-extern "C" { pub fn wcstoumax(__nptr: *const __gwchar_t, __endptr: *mut *mut __gwchar_t, __base: ::std::os::raw::c_int) -> uintmax_t; }
+extern "C" {
+    pub fn wcstoumax(
+        __nptr: *const __gwchar_t,
+        __endptr: *mut *mut __gwchar_t,
+        __base: ::std::os::raw::c_int,
+    ) -> uintmax_t;
+}
 
 pub type ___1172 = i32;
 pub type ___2227 = i64;
@@ -404,536 +480,2414 @@ pub const ZONETYPE_FEPOLYHEDRON: i32 = 7;
 extern "C" {
     #[doc = " New TecIO output routines support 64-bit output, all var types except bit, and out-of-order data output."]
     #[doc = " SZL output only (may support plt in the future), and no polyhedral support yet."]
-    pub fn tecFileWriterOpen(fileName: *const ::std::os::raw::c_char, dataSetTitle: *const ::std::os::raw::c_char, variableList: *const ::std::os::raw::c_char, fileFormat: i32, fileType: i32, defaultVarType: i32, gridFileHandle: *mut ::std::os::raw::c_void, fileHandle: *mut *mut ::std::os::raw::c_void) -> i32;
+    pub fn tecFileWriterOpen(
+        fileName: *const ::std::os::raw::c_char,
+        dataSetTitle: *const ::std::os::raw::c_char,
+        variableList: *const ::std::os::raw::c_char,
+        fileFormat: i32,
+        fileType: i32,
+        defaultVarType: i32,
+        gridFileHandle: *mut ::std::os::raw::c_void,
+        fileHandle: *mut *mut ::std::os::raw::c_void,
+    ) -> i32;
 }
 
-extern "C" { pub fn tecFileSetDiagnosticsLevel(fileHandle: *mut ::std::os::raw::c_void, level: i32) -> i32; }
+extern "C" {
+    pub fn tecFileSetDiagnosticsLevel(fileHandle: *mut ::std::os::raw::c_void, level: i32) -> i32;
+}
 
-extern "C" { pub fn tecZoneCreateIJK(fileHandle: *mut ::std::os::raw::c_void, zoneTitle: *const ::std::os::raw::c_char, imax: i64, jmax: i64, kmax: i64, varTypes: *const i32, shareVarFromZone: *const i32, valueLocations: *const i32, passiveVarList: *const i32, shareFaceNeighborsFromZone: i32, numFaceConnections: i64, faceNeighborMode: i32, zone: *mut i32) -> i32; }
+extern "C" {
+    pub fn tecZoneCreateIJK(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zoneTitle: *const ::std::os::raw::c_char,
+        imax: i64,
+        jmax: i64,
+        kmax: i64,
+        varTypes: *const i32,
+        shareVarFromZone: *const i32,
+        valueLocations: *const i32,
+        passiveVarList: *const i32,
+        shareFaceNeighborsFromZone: i32,
+        numFaceConnections: i64,
+        faceNeighborMode: i32,
+        zone: *mut i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneCreateFE(fileHandle: *mut ::std::os::raw::c_void, zoneTitle: *const ::std::os::raw::c_char, zoneType: i32, numNodes: i64, numCells: i64, varTypes: *const i32, shareVarFromZone: *const i32, valueLocations: *const i32, passiveVarList: *const i32, shareConnectivityFromZone: i32, numFaceConnections: i64, faceNeighborMode: i32, zone: *mut i32) -> i32; }
+extern "C" {
+    pub fn tecZoneCreateFE(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zoneTitle: *const ::std::os::raw::c_char,
+        zoneType: i32,
+        numNodes: i64,
+        numCells: i64,
+        varTypes: *const i32,
+        shareVarFromZone: *const i32,
+        valueLocations: *const i32,
+        passiveVarList: *const i32,
+        shareConnectivityFromZone: i32,
+        numFaceConnections: i64,
+        faceNeighborMode: i32,
+        zone: *mut i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneCreatePoly(fileHandle: *mut ::std::os::raw::c_void, zoneTitle: *const ::std::os::raw::c_char, zoneType: i32, numNodes: i64, numFaces: i64, numCells: i64, totalNumFaceNodes: i64, varTypes: *const i32, shareVarFromZone: *const i32, valueLocations: *const i32, passiveVarList: *const i32, shareConnectivityFromZone: i32, numConnectedBoundaryFaces: i64, totalNumBoundaryConnections: i64, zone: *mut i32) -> i32; }
+extern "C" {
+    pub fn tecZoneCreatePoly(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zoneTitle: *const ::std::os::raw::c_char,
+        zoneType: i32,
+        numNodes: i64,
+        numFaces: i64,
+        numCells: i64,
+        totalNumFaceNodes: i64,
+        varTypes: *const i32,
+        shareVarFromZone: *const i32,
+        valueLocations: *const i32,
+        passiveVarList: *const i32,
+        shareConnectivityFromZone: i32,
+        numConnectedBoundaryFaces: i64,
+        totalNumBoundaryConnections: i64,
+        zone: *mut i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneSetUnsteadyOptions(fileHandle: *mut ::std::os::raw::c_void, zone: i32, solutionTime: f64, strandID: i32) -> i32; }
+extern "C" {
+    pub fn tecZoneSetUnsteadyOptions(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        solutionTime: f64,
+        strandID: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneSetParentZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32, parentZone: i32) -> i32; }
+extern "C" {
+    pub fn tecZoneSetParentZone(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        parentZone: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecFEPartitionCreate32(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, numNodes: i64, numCells: i64, numGhostNodes: i64, ghostNodes: *const i32, neighborPartitions: *const i32, neighborPartitionNodes: *const i32, numGhostCells: i64, ghostCells: *const i32) -> i32; }
+extern "C" {
+    pub fn tecFEPartitionCreate32(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        numNodes: i64,
+        numCells: i64,
+        numGhostNodes: i64,
+        ghostNodes: *const i32,
+        neighborPartitions: *const i32,
+        neighborPartitionNodes: *const i32,
+        numGhostCells: i64,
+        ghostCells: *const i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecFEPartitionCreate64(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, numNodes: i64, numCells: i64, numGhostNodes: i64, ghostNodes: *const i64, neighborPartitions: *const i32, neighborPartitionNodes: *const i64, numGhostCells: i64, ghostCells: *const i64) -> i32; }
+extern "C" {
+    pub fn tecFEPartitionCreate64(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        numNodes: i64,
+        numCells: i64,
+        numGhostNodes: i64,
+        ghostNodes: *const i64,
+        neighborPartitions: *const i32,
+        neighborPartitionNodes: *const i64,
+        numGhostCells: i64,
+        ghostCells: *const i64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecIJKPartitionCreate(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, imin: i64, jmin: i64, kmin: i64, imax: i64, jmax: i64, kmax: i64) -> i32; }
+extern "C" {
+    pub fn tecIJKPartitionCreate(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        imin: i64,
+        jmin: i64,
+        kmin: i64,
+        imax: i64,
+        jmax: i64,
+        kmax: i64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneVarWriteDoubleValues(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, partition: i32, count: i64, values: *const f64) -> i32; }
+extern "C" {
+    pub fn tecZoneVarWriteDoubleValues(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        partition: i32,
+        count: i64,
+        values: *const f64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneVarWriteFloatValues(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, partition: i32, count: i64, values: *const f32) -> i32; }
+extern "C" {
+    pub fn tecZoneVarWriteFloatValues(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        partition: i32,
+        count: i64,
+        values: *const f32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneVarWriteInt32Values(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, partition: i32, count: i64, values: *const i32) -> i32; }
+extern "C" {
+    pub fn tecZoneVarWriteInt32Values(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        partition: i32,
+        count: i64,
+        values: *const i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneVarWriteInt16Values(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, partition: i32, count: i64, values: *const i16) -> i32; }
+extern "C" {
+    pub fn tecZoneVarWriteInt16Values(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        partition: i32,
+        count: i64,
+        values: *const i16,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneVarWriteUInt8Values(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, partition: i32, count: i64, values: *const u8) -> i32; }
+extern "C" {
+    pub fn tecZoneVarWriteUInt8Values(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        partition: i32,
+        count: i64,
+        values: *const u8,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneNodeMapWrite32(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, nodesAreOneBased: i32, count: i64, nodes: *const i32) -> i32; }
+extern "C" {
+    pub fn tecZoneNodeMapWrite32(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        nodesAreOneBased: i32,
+        count: i64,
+        nodes: *const i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneNodeMapWrite64(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, nodeAreOneBased: i32, count: i64, nodes: *const i64) -> i32; }
+extern "C" {
+    pub fn tecZoneNodeMapWrite64(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        nodeAreOneBased: i32,
+        count: i64,
+        nodes: *const i64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneFaceNbrWriteConnections32(fileHandle: *mut ::std::os::raw::c_void, zone: i32, faceNeighbors: *const i32) -> i32; }
+extern "C" {
+    pub fn tecZoneFaceNbrWriteConnections32(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        faceNeighbors: *const i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneFaceNbrWriteConnections64(fileHandle: *mut ::std::os::raw::c_void, zone: i32, faceNeighbors: *const i64) -> i32; }
+extern "C" {
+    pub fn tecZoneFaceNbrWriteConnections64(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        faceNeighbors: *const i64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneWritePolyFaces32(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, numFaces: i32, faceNodeCounts: *const i32, faceNodes: *const i32, faceLeftElems: *const i32, faceRightElems: *const i32, isOneBased: i32) -> i32; }
+extern "C" {
+    pub fn tecZoneWritePolyFaces32(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        numFaces: i32,
+        faceNodeCounts: *const i32,
+        faceNodes: *const i32,
+        faceLeftElems: *const i32,
+        faceRightElems: *const i32,
+        isOneBased: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneWritePolyFaces64(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, numFaces: i64, faceNodeCounts: *const i32, faceNodes: *const i64, faceLeftElems: *const i64, faceRightElems: *const i64, isOneBased: i32) -> i32; }
+extern "C" {
+    pub fn tecZoneWritePolyFaces64(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        numFaces: i64,
+        faceNodeCounts: *const i32,
+        faceNodes: *const i64,
+        faceLeftElems: *const i64,
+        faceRightElems: *const i64,
+        isOneBased: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneWritePolyBoundaryConnections32(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, numBoundaryFaces: i32, faceBoundaryConnectionCounts: *const i32, faceBoundaryConnectionElems: *const i32, faceBoundaryConnectionZones: *const i32, isOneBased: i32) -> i32; }
+extern "C" {
+    pub fn tecZoneWritePolyBoundaryConnections32(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        numBoundaryFaces: i32,
+        faceBoundaryConnectionCounts: *const i32,
+        faceBoundaryConnectionElems: *const i32,
+        faceBoundaryConnectionZones: *const i32,
+        isOneBased: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneWritePolyBoundaryConnections64(fileHandle: *mut ::std::os::raw::c_void, zone: i32, partition: i32, numBoundaryFaces: i64, faceBoundaryConnectionCounts: *const i32, faceBoundaryConnectionElems: *const i64, faceBoundaryConnectionZones: *const i32, isOneBased: i32) -> i32; }
+extern "C" {
+    pub fn tecZoneWritePolyBoundaryConnections64(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        partition: i32,
+        numBoundaryFaces: i64,
+        faceBoundaryConnectionCounts: *const i32,
+        faceBoundaryConnectionElems: *const i64,
+        faceBoundaryConnectionZones: *const i32,
+        isOneBased: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecDataSetAddAuxData(fileHandle: *mut ::std::os::raw::c_void, name: *const ::std::os::raw::c_char, value: *const ::std::os::raw::c_char) -> i32; }
+extern "C" {
+    pub fn tecDataSetAddAuxData(
+        fileHandle: *mut ::std::os::raw::c_void,
+        name: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecVarAddAuxData(fileHandle: *mut ::std::os::raw::c_void, var: i32, name: *const ::std::os::raw::c_char, value: *const ::std::os::raw::c_char) -> i32; }
+extern "C" {
+    pub fn tecVarAddAuxData(
+        fileHandle: *mut ::std::os::raw::c_void,
+        var: i32,
+        name: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecZoneAddAuxData(fileHandle: *mut ::std::os::raw::c_void, zone: i32, name: *const ::std::os::raw::c_char, value: *const ::std::os::raw::c_char) -> i32; }
+extern "C" {
+    pub fn tecZoneAddAuxData(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        name: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeom2DLineSegmentsBegin(fileHandle: *mut ::std::os::raw::c_void, xOrigin: f64, yOrigin: f64, numPoints: i32, relativeX: *const f64, relativeY: *const f64, posCoordMode: i32) -> i32; }
+extern "C" {
+    pub fn tecGeom2DLineSegmentsBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xOrigin: f64,
+        yOrigin: f64,
+        numPoints: i32,
+        relativeX: *const f64,
+        relativeY: *const f64,
+        posCoordMode: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeom2DMultiLineSegmentsBegin(fileHandle: *mut ::std::os::raw::c_void, xOrigin: f64, yOrigin: f64, numSegments: i32, numSegmentPoints: *const i32, relativeX: *const f64, relativeY: *const f64, posCoordMode: i32) -> i32; }
+extern "C" {
+    pub fn tecGeom2DMultiLineSegmentsBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xOrigin: f64,
+        yOrigin: f64,
+        numSegments: i32,
+        numSegmentPoints: *const i32,
+        relativeX: *const f64,
+        relativeY: *const f64,
+        posCoordMode: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeom3DLineSegmentsBegin(fileHandle: *mut ::std::os::raw::c_void, xOrigin: f64, yOrigin: f64, zOrigin: f64, numPoints: i32, relativeX: *const f64, relativeY: *const f64, relativeZ: *const f64) -> i32; }
+extern "C" {
+    pub fn tecGeom3DLineSegmentsBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xOrigin: f64,
+        yOrigin: f64,
+        zOrigin: f64,
+        numPoints: i32,
+        relativeX: *const f64,
+        relativeY: *const f64,
+        relativeZ: *const f64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeom3DMultiLineSegmentsBegin(fileHandle: *mut ::std::os::raw::c_void, xOrigin: f64, yOrigin: f64, zOrigin: f64, numSegments: i32, numSegmentPoints: *const i32, relativeX: *const f64, relativeY: *const f64, relativeZ: *const f64) -> i32; }
+extern "C" {
+    pub fn tecGeom3DMultiLineSegmentsBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xOrigin: f64,
+        yOrigin: f64,
+        zOrigin: f64,
+        numSegments: i32,
+        numSegmentPoints: *const i32,
+        relativeX: *const f64,
+        relativeY: *const f64,
+        relativeZ: *const f64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomCircleBegin(fileHandle: *mut ::std::os::raw::c_void, xCenter: f64, yCenter: f64, radius: f64, posCoordMode: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomCircleBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xCenter: f64,
+        yCenter: f64,
+        radius: f64,
+        posCoordMode: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomEllipseBegin(fileHandle: *mut ::std::os::raw::c_void, xCenter: f64, yCenter: f64, width: f64, height: f64, posCoordMode: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomEllipseBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xCenter: f64,
+        yCenter: f64,
+        width: f64,
+        height: f64,
+        posCoordMode: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomRectangleBegin(fileHandle: *mut ::std::os::raw::c_void, xMin: f64, yMin: f64, xMax: f64, yMax: f64, posCoordMode: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomRectangleBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xMin: f64,
+        yMin: f64,
+        xMax: f64,
+        yMax: f64,
+        posCoordMode: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomSquareBegin(fileHandle: *mut ::std::os::raw::c_void, xMin: f64, yMin: f64, size: f64, posCoordMode: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomSquareBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        xMin: f64,
+        yMin: f64,
+        size: f64,
+        posCoordMode: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomArrowheadSetInfo(fileHandle: *mut ::std::os::raw::c_void, angle: f64, attachment: i32, size: f64, style: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomArrowheadSetInfo(
+        fileHandle: *mut ::std::os::raw::c_void,
+        angle: f64,
+        attachment: i32,
+        size: f64,
+        style: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomEllipseSetNumPoints(fileHandle: *mut ::std::os::raw::c_void, numEllipsePoints: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomEllipseSetNumPoints(
+        fileHandle: *mut ::std::os::raw::c_void,
+        numEllipsePoints: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomSetClipping(fileHandle: *mut ::std::os::raw::c_void, clipping: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomSetClipping(fileHandle: *mut ::std::os::raw::c_void, clipping: i32) -> i32;
+}
 
-extern "C" { pub fn tecGeomSetLineInfo(fileHandle: *mut ::std::os::raw::c_void, linePattern: i32, patternLength: f64, thickness: f64, color: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomSetLineInfo(
+        fileHandle: *mut ::std::os::raw::c_void,
+        linePattern: i32,
+        patternLength: f64,
+        thickness: f64,
+        color: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomSetMacroFunctionCmd(fileHandle: *mut ::std::os::raw::c_void, macroFunctionCmd: *const ::std::os::raw::c_char) -> i32; }
+extern "C" {
+    pub fn tecGeomSetMacroFunctionCmd(
+        fileHandle: *mut ::std::os::raw::c_void,
+        macroFunctionCmd: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecGeomSetScope(fileHandle: *mut ::std::os::raw::c_void, scope: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomSetScope(fileHandle: *mut ::std::os::raw::c_void, scope: i32) -> i32;
+}
 
-extern "C" { pub fn tecGeomAttachToZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomAttachToZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32) -> i32;
+}
 
-extern "C" { pub fn tecGeomFill(fileHandle: *mut ::std::os::raw::c_void, fillColor: i32) -> i32; }
+extern "C" {
+    pub fn tecGeomFill(fileHandle: *mut ::std::os::raw::c_void, fillColor: i32) -> i32;
+}
 
-extern "C" { pub fn tecGeomEnd(fileHandle: *mut ::std::os::raw::c_void) -> i32; }
+extern "C" {
+    pub fn tecGeomEnd(fileHandle: *mut ::std::os::raw::c_void) -> i32;
+}
 
-extern "C" { pub fn tecCustomLabelsAddSet(fileHandle: *mut ::std::os::raw::c_void, labels: *const ::std::os::raw::c_char) -> i32; }
+extern "C" {
+    pub fn tecCustomLabelsAddSet(
+        fileHandle: *mut ::std::os::raw::c_void,
+        labels: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecText2DBegin(fileHandle: *mut ::std::os::raw::c_void, string: *const ::std::os::raw::c_char, x: f64, y: f64, posCoordMode: i32, height: f64, sizeUnits: i32) -> i32; }
+extern "C" {
+    pub fn tecText2DBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        string: *const ::std::os::raw::c_char,
+        x: f64,
+        y: f64,
+        posCoordMode: i32,
+        height: f64,
+        sizeUnits: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecText3DBegin(fileHandle: *mut ::std::os::raw::c_void, string: *const ::std::os::raw::c_char, x: f64, y: f64, z: f64, height: f64, sizeUnits: i32) -> i32; }
+extern "C" {
+    pub fn tecText3DBegin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        string: *const ::std::os::raw::c_char,
+        x: f64,
+        y: f64,
+        z: f64,
+        height: f64,
+        sizeUnits: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecTextAttachToZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32) -> i32; }
+extern "C" {
+    pub fn tecTextAttachToZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32) -> i32;
+}
 
-extern "C" { pub fn tecTextBoxSetInfo(fileHandle: *mut ::std::os::raw::c_void, boxType: i32, lineColor: i32, fillColor: i32, lineThickness: f64, margin: f64) -> i32; }
+extern "C" {
+    pub fn tecTextBoxSetInfo(
+        fileHandle: *mut ::std::os::raw::c_void,
+        boxType: i32,
+        lineColor: i32,
+        fillColor: i32,
+        lineThickness: f64,
+        margin: f64,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecTextSetAnchor(fileHandle: *mut ::std::os::raw::c_void, anchor: i32) -> i32; }
+extern "C" {
+    pub fn tecTextSetAnchor(fileHandle: *mut ::std::os::raw::c_void, anchor: i32) -> i32;
+}
 
-extern "C" { pub fn tecTextSetAngle(fileHandle: *mut ::std::os::raw::c_void, angle: f64) -> i32; }
+extern "C" {
+    pub fn tecTextSetAngle(fileHandle: *mut ::std::os::raw::c_void, angle: f64) -> i32;
+}
 
-extern "C" { pub fn tecTextSetClipping(fileHandle: *mut ::std::os::raw::c_void, clipping: i32) -> i32; }
+extern "C" {
+    pub fn tecTextSetClipping(fileHandle: *mut ::std::os::raw::c_void, clipping: i32) -> i32;
+}
 
-extern "C" { pub fn tecTextSetColor(fileHandle: *mut ::std::os::raw::c_void, color: i32) -> i32; }
+extern "C" {
+    pub fn tecTextSetColor(fileHandle: *mut ::std::os::raw::c_void, color: i32) -> i32;
+}
 
-extern "C" { pub fn tecTextSetTypeface(fileHandle: *mut ::std::os::raw::c_void, family: *const ::std::os::raw::c_char, isBold: i32, isItalic: i32) -> i32; }
+extern "C" {
+    pub fn tecTextSetTypeface(
+        fileHandle: *mut ::std::os::raw::c_void,
+        family: *const ::std::os::raw::c_char,
+        isBold: i32,
+        isItalic: i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecTextSetLineSpacing(fileHandle: *mut ::std::os::raw::c_void, lineSpacing: f64) -> i32; }
+extern "C" {
+    pub fn tecTextSetLineSpacing(fileHandle: *mut ::std::os::raw::c_void, lineSpacing: f64) -> i32;
+}
 
-extern "C" { pub fn tecTextSetMacroFunctionCmd(fileHandle: *mut ::std::os::raw::c_void, macroFunctionCmd: *const ::std::os::raw::c_char) -> i32; }
+extern "C" {
+    pub fn tecTextSetMacroFunctionCmd(
+        fileHandle: *mut ::std::os::raw::c_void,
+        macroFunctionCmd: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecTextSetScope(fileHandle: *mut ::std::os::raw::c_void, scope: i32) -> i32; }
+extern "C" {
+    pub fn tecTextSetScope(fileHandle: *mut ::std::os::raw::c_void, scope: i32) -> i32;
+}
 
-extern "C" { pub fn tecTextEnd(fileHandle: *mut ::std::os::raw::c_void) -> i32; }
+extern "C" {
+    pub fn tecTextEnd(fileHandle: *mut ::std::os::raw::c_void) -> i32;
+}
 
-extern "C" { pub fn tecUserRecAdd(fileHandle: *mut ::std::os::raw::c_void, userRec: *const ::std::os::raw::c_char) -> i32; }
+extern "C" {
+    pub fn tecUserRecAdd(
+        fileHandle: *mut ::std::os::raw::c_void,
+        userRec: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecFileWriterFlush(fileHandle: *mut ::std::os::raw::c_void, numZonesToRetain: i32, zonesToRetain: *const i32) -> i32; }
+extern "C" {
+    pub fn tecFileWriterFlush(
+        fileHandle: *mut ::std::os::raw::c_void,
+        numZonesToRetain: i32,
+        zonesToRetain: *const i32,
+    ) -> i32;
+}
 
-extern "C" { pub fn tecFileWriterClose(fileHandle: *mut *mut ::std::os::raw::c_void) -> i32; }
+extern "C" {
+    pub fn tecFileWriterClose(fileHandle: *mut *mut ::std::os::raw::c_void) -> i32;
+}
 
 extern "C" {
     #[doc = " SZL file reading routines"]
-    pub fn tecCustomLabelsGetNumSets(fileHandle: *mut ::std::os::raw::c_void, numSets: *mut i32) -> i32;
+    pub fn tecCustomLabelsGetNumSets(
+        fileHandle: *mut ::std::os::raw::c_void,
+        numSets: *mut i32,
+    ) -> i32;
 }
 
-extern "C" { pub fn tecCustomLabelsGetSet(fileHandle: *mut ::std::os::raw::c_void, whichSet: i32, labelSet: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecDataSetAuxDataGetItem(fileHandle: *mut ::std::os::raw::c_void, whichItem: i32, name: *mut *mut ::std::os::raw::c_char, value: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecDataSetAuxDataGetNumItems(fileHandle: *mut ::std::os::raw::c_void, numItems: *mut i32) -> i32; }
-
-extern "C" { pub fn tecDataSetGetNumVars(fileHandle: *mut ::std::os::raw::c_void, numVars: *mut i32) -> i32; }
-
-extern "C" { pub fn tecDataSetGetNumZones(fileHandle: *mut ::std::os::raw::c_void, numZones: *mut i32) -> i32; }
-
-extern "C" { pub fn tecDataSetGetTitle(fileHandle: *mut ::std::os::raw::c_void, title: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecFileGetType(fileHandle: *mut ::std::os::raw::c_void, fileType: *mut i32) -> i32; }
-
-extern "C" { pub fn tecFileReaderClose(fileHandle: *mut *mut ::std::os::raw::c_void) -> i32; }
-
-extern "C" { pub fn tecFileReaderOpen(fileName: *const ::std::os::raw::c_char, fileHandle: *mut *mut ::std::os::raw::c_void) -> i32; }
-
-extern "C" { pub fn tecGeomArrowheadGetAngle(fileHandle: *mut ::std::os::raw::c_void, geom: i32, angle: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomArrowheadGetAttach(fileHandle: *mut ::std::os::raw::c_void, geom: i32, attachment: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomArrowheadGetSize(fileHandle: *mut ::std::os::raw::c_void, geom: i32, arrowheadSize: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomArrowheadGetStyle(fileHandle: *mut ::std::os::raw::c_void, geom: i32, arrowheadStyle: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomCircleGetRadius(fileHandle: *mut ::std::os::raw::c_void, geom: i32, radius: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomEllipseGetNumPoints(fileHandle: *mut ::std::os::raw::c_void, geom: i32, numEllipsePoints: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomEllipseGetSize(fileHandle: *mut ::std::os::raw::c_void, geom: i32, horizontalAxis: *mut f64, verticalAxis: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomGetAnchorPos(fileHandle: *mut ::std::os::raw::c_void, geom: i32, x: *mut f64, y: *mut f64, z: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomGetClipping(fileHandle: *mut ::std::os::raw::c_void, geom: i32, clipping: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetColor(fileHandle: *mut ::std::os::raw::c_void, geom: i32, color: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetCoordMode(fileHandle: *mut ::std::os::raw::c_void, geom: i32, coordMode: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetFillColor(fileHandle: *mut ::std::os::raw::c_void, geom: i32, fillColor: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetLinePattern(fileHandle: *mut ::std::os::raw::c_void, geom: i32, linePattern: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetLineThickness(fileHandle: *mut ::std::os::raw::c_void, geom: i32, lineThickness: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomGetMacroFunctionCmd(fileHandle: *mut ::std::os::raw::c_void, geom: i32, macroFunctionCmd: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecGeomGetNumGeoms(fileHandle: *mut ::std::os::raw::c_void, numGeoms: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetPatternLength(fileHandle: *mut ::std::os::raw::c_void, geom: i32, patternLength: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomGetScope(fileHandle: *mut ::std::os::raw::c_void, geom: i32, scope: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetType(fileHandle: *mut ::std::os::raw::c_void, geom: i32, type_: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomGetZone(fileHandle: *mut ::std::os::raw::c_void, geom: i32, zone: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomIsAttached(fileHandle: *mut ::std::os::raw::c_void, geom: i32, isAttached: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomIsFilled(fileHandle: *mut ::std::os::raw::c_void, geom: i32, isFilled: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomLineGetPoint(fileHandle: *mut ::std::os::raw::c_void, geom: i32, segment: i32, index: i32, x: *mut f64, y: *mut f64, z: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomLineGetSegmentCount(fileHandle: *mut ::std::os::raw::c_void, geom: i32, segmentCount: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomLineSegmentGetPointCount(fileHandle: *mut ::std::os::raw::c_void, geom: i32, segment: i32, pointCount: *mut i32) -> i32; }
-
-extern "C" { pub fn tecGeomRectangleGetSize(fileHandle: *mut ::std::os::raw::c_void, geom: i32, width: *mut f64, height: *mut f64) -> i32; }
-
-extern "C" { pub fn tecGeomSquareGetSize(fileHandle: *mut ::std::os::raw::c_void, geom: i32, size: *mut f64) -> i32; }
-
-extern "C" { pub fn tecStringFree(string: *mut *mut ::std::os::raw::c_char); }
-
-extern "C" { pub fn tecStringLength(string: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecTextBoxGetColor(fileHandle: *mut ::std::os::raw::c_void, text: i32, boxColor: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextBoxGetFillColor(fileHandle: *mut ::std::os::raw::c_void, text: i32, boxFillColor: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextBoxGetLineThickness(fileHandle: *mut ::std::os::raw::c_void, text: i32, boxLineThickness: *mut f64) -> i32; }
-
-extern "C" { pub fn tecTextBoxGetMargin(fileHandle: *mut ::std::os::raw::c_void, text: i32, boxMargin: *mut f64) -> i32; }
-
-extern "C" { pub fn tecTextBoxGetType(fileHandle: *mut ::std::os::raw::c_void, text: i32, boxType: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetAnchor(fileHandle: *mut ::std::os::raw::c_void, text: i32, anchor: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetAnchorPos(fileHandle: *mut ::std::os::raw::c_void, text: i32, x: *mut f64, y: *mut f64, z: *mut f64) -> i32; }
-
-extern "C" { pub fn tecTextGetAngle(fileHandle: *mut ::std::os::raw::c_void, text: i32, angle: *mut f64) -> i32; }
-
-extern "C" { pub fn tecTextGetClipping(fileHandle: *mut ::std::os::raw::c_void, text: i32, clipping: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetColor(fileHandle: *mut ::std::os::raw::c_void, text: i32, color: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetCoordMode(fileHandle: *mut ::std::os::raw::c_void, text: i32, coordMode: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetHeight(fileHandle: *mut ::std::os::raw::c_void, text: i32, height: *mut f64) -> i32; }
-
-extern "C" { pub fn tecTextGetLineSpacing(fileHandle: *mut ::std::os::raw::c_void, text: i32, lineSpacing: *mut f64) -> i32; }
-
-extern "C" { pub fn tecTextGetMacroFunctionCmd(fileHandle: *mut ::std::os::raw::c_void, text: i32, macroFunctionCmd: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecTextGetNumTexts(fileHandle: *mut ::std::os::raw::c_void, numTexts: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetScope(fileHandle: *mut ::std::os::raw::c_void, text: i32, scope: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetSizeUnits(fileHandle: *mut ::std::os::raw::c_void, text: i32, sizeUnits: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextGetString(fileHandle: *mut ::std::os::raw::c_void, text: i32, string: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecTextGetTypeface(fileHandle: *mut ::std::os::raw::c_void, text: i32, typeface: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecTextGetZone(fileHandle: *mut ::std::os::raw::c_void, text: i32, zone: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextIsAttached(fileHandle: *mut ::std::os::raw::c_void, text: i32, isAttached: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextIsBold(fileHandle: *mut ::std::os::raw::c_void, text: i32, isBold: *mut i32) -> i32; }
-
-extern "C" { pub fn tecTextIsItalic(fileHandle: *mut ::std::os::raw::c_void, text: i32, isItalic: *mut i32) -> i32; }
-
-extern "C" { pub fn tecVarAuxDataGetItem(fileHandle: *mut ::std::os::raw::c_void, var: i32, whichItem: i32, name: *mut *mut ::std::os::raw::c_char, value: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecVarAuxDataGetNumItems(fileHandle: *mut ::std::os::raw::c_void, var: i32, numItems: *mut i32) -> i32; }
-
-extern "C" { pub fn tecVarGetName(fileHandle: *mut ::std::os::raw::c_void, var: i32, name: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecVarIsEnabled(fileHandle: *mut ::std::os::raw::c_void, var: i32, isEnabled: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneAuxDataGetItem(fileHandle: *mut ::std::os::raw::c_void, zone: i32, whichItem: i32, name: *mut *mut ::std::os::raw::c_char, value: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecZoneAuxDataGetNumItems(fileHandle: *mut ::std::os::raw::c_void, zone: i32, numItems: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneConnectivityGetSharedZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32, sharedZone: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneFaceNbrGetConnections(fileHandle: *mut ::std::os::raw::c_void, zone: i32, connections: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneFaceNbrGetConnections64(fileHandle: *mut ::std::os::raw::c_void, zone: i32, connections: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneFaceNbrGetMode(fileHandle: *mut ::std::os::raw::c_void, zone: i32, mode: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneFaceNbrGetNumConnections(fileHandle: *mut ::std::os::raw::c_void, zone: i32, numConnections: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneFaceNbrGetNumValues(fileHandle: *mut ::std::os::raw::c_void, zone: i32, numValues: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneFaceNbrsAre64Bit(fileHandle: *mut ::std::os::raw::c_void, zone: i32, are64Bit: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneGetIJK(fileHandle: *mut ::std::os::raw::c_void, zone: i32, iMax: *mut i64, jMax: *mut i64, kMax: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneGetParentZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32, parentZone: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneGetSolutionTime(fileHandle: *mut ::std::os::raw::c_void, zone: i32, solutionTime: *mut f64) -> i32; }
-
-extern "C" { pub fn tecZoneGetStrandID(fileHandle: *mut ::std::os::raw::c_void, zone: i32, strandID: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneGetTitle(fileHandle: *mut ::std::os::raw::c_void, zone: i32, title: *mut *mut ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecZoneGetType(fileHandle: *mut ::std::os::raw::c_void, zone: i32, type_: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneIsEnabled(fileHandle: *mut ::std::os::raw::c_void, zone: i32, isEnabled: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneNodeMapGet(fileHandle: *mut ::std::os::raw::c_void, zone: i32, startCell: i64, numCells: i64, nodeMap: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneNodeMapGet64(fileHandle: *mut ::std::os::raw::c_void, zone: i32, startCell: i64, numCells: i64, nodeMap: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneNodeMapGetNumValues(fileHandle: *mut ::std::os::raw::c_void, zone: i32, numCells: i64, numValues: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneNodeMapIs64Bit(fileHandle: *mut ::std::os::raw::c_void, zone: i32, is64Bit: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetBoundaryConnectionCounts(fileHandle: *mut ::std::os::raw::c_void, zone: i32, startConnection: i64, numConnections: i64, connectionCounts: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetBoundaryConnections(fileHandle: *mut ::std::os::raw::c_void, zone: i32, startConnection: i64, numConnections: i64, connectedElements: *mut i32, connectedZones: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetFaceElems(fileHandle: *mut ::std::os::raw::c_void, zone: i32, startFace: i64, numFaces: i64, leftElems: *mut i32, rightElems: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetFaceNodeCounts(fileHandle: *mut ::std::os::raw::c_void, zone: i32, startFace: i64, numFaces: i64, nodeCounts: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetFaceNodes(fileHandle: *mut ::std::os::raw::c_void, zone: i32, startFace: i64, numFaces: i64, faceNodes: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetNumConnectedBoundaryFaces(fileHandle: *mut ::std::os::raw::c_void, zone: i32, numFaces: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetTotalNumFaceNodes(fileHandle: *mut ::std::os::raw::c_void, zone: i32, numNodes: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZonePolyGetTotalNumBoundaryConnections(fileHandle: *mut ::std::os::raw::c_void, zone: i32, numConnections: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetDoubleValues(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, startIndex: i64, numValues: i64, values: *mut f64) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetFloatValues(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, startIndex: i64, numValues: i64, values: *mut f32) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetInt16Values(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, startIndex: i64, numValues: i64, values: *mut i16) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetInt32Values(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, startIndex: i64, numValues: i64, values: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetNumValues(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, numValues: *mut i64) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetSharedZone(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, sharedZone: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetType(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, type_: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetUInt8Values(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, startIndex: i64, numValues: i64, values: *mut u8) -> i32; }
-
-extern "C" { pub fn tecZoneVarGetValueLocation(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, location: *mut i32) -> i32; }
-
-extern "C" { pub fn tecZoneVarIsPassive(fileHandle: *mut ::std::os::raw::c_void, zone: i32, var: i32, isPassive: *mut i32) -> i32; }
-
-extern "C" { pub fn tecini142(Title: *const ::std::os::raw::c_char, Variables: *const ::std::os::raw::c_char, FName: *const ::std::os::raw::c_char, ScratchDir: *const ::std::os::raw::c_char, FileFormat: *const i32, FileType: *const i32, Debug: *const i32, VIsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn teczne142(ZoneTitle: *const ::std::os::raw::c_char, ZoneType: *const i32, IMxOrNumPts: *const i32, JMxOrNumElements: *const i32, KMxOrNumFaces: *const i32, ICellMx: *const i32, JCellMx: *const i32, KCellMx: *const i32, SolutionTime: *const f64, StrandID: *const i32, ParentZone: *const i32, IsBlock: *const i32, NumFaceConnections: *const i32, FaceNeighborMode: *const i32, TotalNumFaceNodes: *const i32, NumConnectedBoundaryFaces: *const i32, TotalNumBoundaryConnections: *const i32, PassiveVarList: *const i32, ValueLocation: *const i32, ShareVarFromZone: *const i32, ShareConnectivityFromZone: *const i32) -> i32; }
-
-extern "C" { pub fn tecdat142(N: *const i32, FieldData: *const ::std::os::raw::c_void, IsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn tecdatd142(N: *const i32, FieldData: *const f64) -> i32; }
-
-extern "C" { pub fn tecdatf142(N: *const i32, FieldData: *const f32) -> i32; }
-
-extern "C" { pub fn tecnod142(NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecnode142(N: *const i32, NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecflush142(NumZonesToRetain: *const i32, ZonesToRetain: *const i32) -> i32; }
-
-extern "C" { pub fn tecend142() -> i32; }
-
-extern "C" { pub fn teclab142(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecusr142(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecgeo142(XPos: *const f64, YPos: *const f64, ZPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, Color: *const i32, FillColor: *const i32, IsFilled: *const i32, GeomType: *const i32, LinePattern: *const i32, PatternLength: *const f64, LineThickness: *const f64, NumEllipsePts: *const i32, ArrowheadStyle: *const i32, ArrowheadAttachment: *const i32, ArrowheadSize: *const f64, ArrowheadAngle: *const f64, Scope: *const i32, Clipping: *const i32, NumSegments: *const i32, NumSegPts: *const i32, XGeomData: *const f32, YGeomData: *const f32, ZGeomData: *const f32, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tectxt142(XOrThetaPos: *const f64, YOrRPos: *const f64, ZOrUnusedPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, BFont: *const i32, FontHeightUnits: *const i32, FontHeight: *const f64, BoxType: *const i32, BoxMargin: *const f64, BoxLineThickness: *const f64, BoxColor: *const i32, BoxFillColor: *const i32, Angle: *const f64, Anchor: *const i32, LineSpacing: *const f64, TextColor: *const i32, Scope: *const i32, Clipping: *const i32, String: *const ::std::os::raw::c_char, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecfil142(F: *const i32) -> i32; }
-
-extern "C" { pub fn tecforeign142(OutputForeignByteOrder: *const i32); }
-
-extern "C" { pub fn tecauxstr142(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn teczauxstr142(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecvauxstr142(Var: *const i32, Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecface142(FaceConnections: *const i32) -> i32; }
-
-extern "C" { pub fn tecpoly142(FaceNodeCounts: *const i32, FaceNodes: *const i32, FaceLeftElems: *const i32, FaceRightElems: *const i32, FaceBndryConnectionCounts: *const i32, FaceBndryConnectionElems: *const i32, FaceBndryConnectionZones: *const i32) -> i32; }
-
-extern "C" { pub fn tecpolyface142(NumFaces: *const i32, FaceNodeCounts: *const i32, FaceNodes: *const i32, FaceLeftElems: *const i32, FaceRightElems: *const i32) -> i32; }
-
-extern "C" { pub fn tecpolybconn142(NumBndryFaces: *const i32, FaceBndryConnectionCounts: *const i32, FaceBndryConnectionElems: *const i32, FaceBndryConnectionZones: *const i32) -> i32; }
-
-extern "C" { pub fn tecfeptn142(partition: *const i32, numnodes: *const i32, numcells: *const i32, ngnodes: *const i32, gnodes: *const i32, gnpartitions: *const i32, gnpnodes: *const i32, ngcells: *const i32, gcells: *const i32) -> i32; }
-
-extern "C" { pub fn tecijkptn142(partition: *const i32, imin: *const i32, jmin: *const i32, kmin: *const i32, imax: *const i32, jmax: *const i32, kmax: *const i32) -> i32; }
-
-extern "C" { pub fn tecmpiinit142(communicator: *mut ::std::os::raw::c_void, mainrank: *const i32) -> i32; }
-
-extern "C" { pub fn tecznemap142(npartitions: *const i32, ptnranks: *const i32) -> i32; }
-
-extern "C" { pub fn tecini112(Title: *const ::std::os::raw::c_char, Variables: *const ::std::os::raw::c_char, FName: *const ::std::os::raw::c_char, ScratchDir: *const ::std::os::raw::c_char, FileType: *const i32, Debug: *const i32, VIsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn teczne112(ZoneTitle: *const ::std::os::raw::c_char, ZoneType: *const i32, IMxOrNumPts: *const i32, JMxOrNumElements: *const i32, KMxOrNumFaces: *const i32, ICellMx: *const i32, JCellMx: *const i32, KCellMx: *const i32, SolutionTime: *const f64, StrandID: *const i32, ParentZone: *const i32, IsBlock: *const i32, NumFaceConnections: *const i32, FaceNeighborMode: *const i32, TotalNumFaceNodes: *const i32, NumConnectedBoundaryFaces: *const i32, TotalNumBoundaryConnections: *const i32, PassiveVarList: *const i32, ValueLocation: *const i32, ShareVarFromZone: *const i32, ShareConnectivityFromZone: *const i32) -> i32; }
-
-extern "C" { pub fn tecdat112(N: *const i32, FieldData: *const ::std::os::raw::c_void, IsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn tecnod112(NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecnode112(N: *const i32, NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecend112() -> i32; }
-
-extern "C" { pub fn teclab112(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecusr112(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecgeo112(XPos: *const f64, YPos: *const f64, ZPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, Color: *const i32, FillColor: *const i32, IsFilled: *const i32, GeomType: *const i32, LinePattern: *const i32, PatternLength: *const f64, LineThickness: *const f64, NumEllipsePts: *const i32, ArrowheadStyle: *const i32, ArrowheadAttachment: *const i32, ArrowheadSize: *const f64, ArrowheadAngle: *const f64, Scope: *const i32, Clipping: *const i32, NumSegments: *const i32, NumSegPts: *const i32, XGeomData: *const f32, YGeomData: *const f32, ZGeomData: *const f32, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tectxt112(XOrThetaPos: *const f64, YOrRPos: *const f64, ZOrUnusedPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, BFont: *const i32, FontHeightUnits: *const i32, FontHeight: *const f64, BoxType: *const i32, BoxMargin: *const f64, BoxLineThickness: *const f64, BoxColor: *const i32, BoxFillColor: *const i32, Angle: *const f64, Anchor: *const i32, LineSpacing: *const f64, TextColor: *const i32, Scope: *const i32, Clipping: *const i32, String: *const ::std::os::raw::c_char, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecfil112(F: *const i32) -> i32; }
-
-extern "C" { pub fn tecforeign112(OutputForeignByteOrder: *const i32); }
-
-extern "C" { pub fn tecauxstr112(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn teczauxstr112(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecvauxstr112(Var: *const i32, Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecface112(FaceConnections: *const i32) -> i32; }
-
-extern "C" { pub fn tecpoly112(FaceNodeCounts: *const i32, FaceNodes: *const i32, FaceLeftElems: *const i32, FaceRightElems: *const i32, FaceBndryConnectionCounts: *const i32, FaceBndryConnectionElems: *const i32, FaceBndryConnectionZones: *const i32) -> i32; }
-
-extern "C" { pub fn tecpolyface112(NumFaces: *const i32, FaceNodeCounts: *const i32, FaceNodes: *const i32, FaceLeftElems: *const i32, FaceRightElems: *const i32) -> i32; }
-
-extern "C" { pub fn tecpolybconn112(NumBndryFaces: *const i32, FaceBndryConnectionCounts: *const i32, FaceBndryConnectionElems: *const i32, FaceBndryConnectionZones: *const i32) -> i32; }
-
-extern "C" { pub fn tecini111(Title: *const ::std::os::raw::c_char, Variables: *const ::std::os::raw::c_char, FName: *const ::std::os::raw::c_char, ScratchDir: *const ::std::os::raw::c_char, FileType: *const i32, Debug: *const i32, VIsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn teczne111(ZoneTitle: *const ::std::os::raw::c_char, ZoneType: *const i32, IMxOrNumPts: *const i32, JMxOrNumElements: *const i32, KMxOrNumFaces: *const i32, ICellMx: *const i32, JCellMx: *const i32, KCellMx: *const i32, SolutionTime: *const f64, StrandID: *const i32, ParentZone: *const i32, IsBlock: *const i32, NumFaceConnections: *const i32, FaceNeighborMode: *const i32, TotalNumFaceNodes: *const i32, NumConnectedBoundaryFaces: *const i32, TotalNumBoundaryConnections: *const i32, PassiveVarList: *const i32, ValueLocation: *const i32, ShareVarFromZone: *const i32, ShareConnectivityFromZone: *const i32) -> i32; }
-
-extern "C" { pub fn tecdat111(N: *const i32, FieldData: *const ::std::os::raw::c_void, IsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn tecnod111(NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecend111() -> i32; }
-
-extern "C" { pub fn teclab111(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecusr111(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecgeo111(XPos: *const f64, YPos: *const f64, ZPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, Color: *const i32, FillColor: *const i32, IsFilled: *const i32, GeomType: *const i32, LinePattern: *const i32, PatternLength: *const f64, LineThickness: *const f64, NumEllipsePts: *const i32, ArrowheadStyle: *const i32, ArrowheadAttachment: *const i32, ArrowheadSize: *const f64, ArrowheadAngle: *const f64, Scope: *const i32, Clipping: *const i32, NumSegments: *const i32, NumSegPts: *const i32, XGeomData: *const f32, YGeomData: *const f32, ZGeomData: *const f32, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tectxt111(XOrThetaPos: *const f64, YOrRPos: *const f64, ZOrUnusedPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, BFont: *const i32, FontHeightUnits: *const i32, FontHeight: *const f64, BoxType: *const i32, BoxMargin: *const f64, BoxLineThickness: *const f64, BoxColor: *const i32, BoxFillColor: *const i32, Angle: *const f64, Anchor: *const i32, LineSpacing: *const f64, TextColor: *const i32, Scope: *const i32, Clipping: *const i32, String: *const ::std::os::raw::c_char, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecfil111(F: *const i32) -> i32; }
-
-extern "C" { pub fn tecforeign111(OutputForeignByteOrder: *const i32); }
-
-extern "C" { pub fn tecauxstr111(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn teczauxstr111(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecvauxstr111(Var: *const i32, Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecface111(FaceConnections: *const i32) -> i32; }
-
-extern "C" { pub fn tecpoly111(FaceNodeCounts: *const i32, FaceNodes: *const i32, FaceLeftElems: *const i32, FaceRightElems: *const i32, FaceBndryConnectionCounts: *const i32, FaceBndryConnectionElems: *const i32, FaceBndryConnectionZones: *const i16) -> i32; }
-
-extern "C" { pub fn tecini110(Title: *const ::std::os::raw::c_char, Variables: *const ::std::os::raw::c_char, FName: *const ::std::os::raw::c_char, ScratchDir: *const ::std::os::raw::c_char, Debug: *const i32, VIsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn teczne110(ZoneTitle: *const ::std::os::raw::c_char, ZoneType: *const i32, IMxOrNumPts: *const i32, JMxOrNumElements: *const i32, KMxOrNumFaces: *const i32, ICellMx: *const i32, JCellMx: *const i32, KCellMx: *const i32, SolutionTime: *const f64, StrandID: *const i32, ParentZone: *const i32, IsBlock: *const i32, NumFaceConnections: *const i32, FaceNeighborMode: *const i32, PassiveVarList: *const i32, ValueLocation: *const i32, ShareVarFromZone: *const i32, ShareConnectivityFromZone: *const i32) -> i32; }
-
-extern "C" { pub fn tecdat110(N: *const i32, FieldData: *const ::std::os::raw::c_void, IsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn tecnod110(NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecend110() -> i32; }
-
-extern "C" { pub fn teclab110(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecusr110(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecgeo110(XPos: *const f64, YPos: *const f64, ZPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, Color: *const i32, FillColor: *const i32, IsFilled: *const i32, GeomType: *const i32, LinePattern: *const i32, PatternLength: *const f64, LineThickness: *const f64, NumEllipsePts: *const i32, ArrowheadStyle: *const i32, ArrowheadAttachment: *const i32, ArrowheadSize: *const f64, ArrowheadAngle: *const f64, Scope: *const i32, Clipping: *const i32, NumSegments: *const i32, NumSegPts: *const i32, XGeomData: *const f32, YGeomData: *const f32, ZGeomData: *const f32, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tectxt110(XOrThetaPos: *const f64, YOrRPos: *const f64, ZOrUnusedPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, BFont: *const i32, FontHeightUnits: *const i32, FontHeight: *const f64, BoxType: *const i32, BoxMargin: *const f64, BoxLineThickness: *const f64, BoxColor: *const i32, BoxFillColor: *const i32, Angle: *const f64, Anchor: *const i32, LineSpacing: *const f64, TextColor: *const i32, Scope: *const i32, Clipping: *const i32, String: *const ::std::os::raw::c_char, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecforeign110(OutputForeignByteOrder: *const i32); }
-
-extern "C" { pub fn tecfil110(F: *const i32) -> i32; }
-
-extern "C" { pub fn tecauxstr110(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn teczauxstr110(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecvauxstr110(Var: *const i32, Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecface110(FaceConnections: *const i32) -> i32; }
-
-extern "C" { pub fn tecini100(Title: *const ::std::os::raw::c_char, Variables: *const ::std::os::raw::c_char, FName: *const ::std::os::raw::c_char, ScratchDir: *const ::std::os::raw::c_char, Debug: *const i32, VIsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn teczne100(ZoneTitle: *const ::std::os::raw::c_char, ZoneType: *const i32, IMxOrNumPts: *const i32, JMxOrNumElements: *const i32, KMxOrNumFaces: *const i32, ICellMx: *const i32, JCellMx: *const i32, KCellMx: *const i32, IsBlock: *const i32, NumFaceConnections: *const i32, FaceNeighborMode: *const i32, ValueLocation: *const i32, ShareVarFromZone: *const i32, ShareConnectivityFromZone: *const i32) -> i32; }
-
-extern "C" { pub fn tecdat100(N: *const i32, FieldData: *const ::std::os::raw::c_void, IsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn tecnod100(NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecend100() -> i32; }
-
-extern "C" { pub fn teclab100(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecusr100(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecgeo100(XPos: *const f64, YPos: *const f64, ZPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, Color: *const i32, FillColor: *const i32, IsFilled: *const i32, GeomType: *const i32, LinePattern: *const i32, PatternLength: *const f64, LineThickness: *const f64, NumEllipsePts: *const i32, ArrowheadStyle: *const i32, ArrowheadAttachment: *const i32, ArrowheadSize: *const f64, ArrowheadAngle: *const f64, Scope: *const i32, Clipping: *const i32, NumSegments: *const i32, NumSegPts: *const i32, XGeomData: *const f32, YGeomData: *const f32, ZGeomData: *const f32, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tectxt100(XOrThetaPos: *const f64, YOrRPos: *const f64, ZOrUnusedPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, BFont: *const i32, FontHeightUnits: *const i32, FontHeight: *const f64, BoxType: *const i32, BoxMargin: *const f64, BoxLineThickness: *const f64, BoxColor: *const i32, BoxFillColor: *const i32, Angle: *const f64, Anchor: *const i32, LineSpacing: *const f64, TextColor: *const i32, Scope: *const i32, Clipping: *const i32, String: *const ::std::os::raw::c_char, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecfil100(F: *const i32) -> i32; }
-
-extern "C" { pub fn tecforeign100(OutputForeignByteOrder: *const i32); }
-
-extern "C" { pub fn tecauxstr100(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn teczauxstr100(Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecvauxstr100(Var: *const i32, Name: *const ::std::os::raw::c_char, Value: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecface100(FaceConnections: *const i32) -> i32; }
-
-extern "C" { pub fn tecini(Title: *const ::std::os::raw::c_char, Variables: *const ::std::os::raw::c_char, FName: *const ::std::os::raw::c_char, ScratchDir: *const ::std::os::raw::c_char, Debug: *const i32, VIsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn teczne(ZoneTitle: *const ::std::os::raw::c_char, IMx: *const i32, JMx: *const i32, KMx: *const i32, ZFormat: *const ::std::os::raw::c_char, DupList: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecdat(N: *const i32, FieldData: *const ::std::os::raw::c_void, IsDouble: *const i32) -> i32; }
-
-extern "C" { pub fn tecnod(NData: *const i32) -> i32; }
-
-extern "C" { pub fn tecend() -> i32; }
-
-extern "C" { pub fn teclab(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecusr(S: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecgeo(XPos: *const f64, YPos: *const f64, ZPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, Color: *const i32, FillColor: *const i32, IsFilled: *const i32, GeomType: *const i32, LinePattern: *const i32, PatternLength: *const f64, LineThickness: *const f64, NumEllipsePts: *const i32, ArrowheadStyle: *const i32, ArrowheadAttachment: *const i32, ArrowheadSize: *const f64, ArrowheadAngle: *const f64, Scope: *const i32, NumSegments: *const i32, NumSegPts: *const i32, XGeomData: *const f32, YGeomData: *const f32, ZGeomData: *const f32, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tectxt(XPos: *const f64, YPos: *const f64, PosCoordMode: *const i32, AttachToZone: *const i32, Zone: *const i32, BFont: *const i32, FontHeightUnits: *const i32, FontHeight: *const f64, BoxType: *const i32, BoxMargin: *const f64, BoxLineThickness: *const f64, BoxColor: *const i32, BoxFillColor: *const i32, Angle: *const f64, Anchor: *const i32, LineSpacing: *const f64, TextColor: *const i32, Scope: *const i32, Text: *const ::std::os::raw::c_char, mfc: *const ::std::os::raw::c_char) -> i32; }
-
-extern "C" { pub fn tecfil(F: *const i32) -> i32; }
+extern "C" {
+    pub fn tecCustomLabelsGetSet(
+        fileHandle: *mut ::std::os::raw::c_void,
+        whichSet: i32,
+        labelSet: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecDataSetAuxDataGetItem(
+        fileHandle: *mut ::std::os::raw::c_void,
+        whichItem: i32,
+        name: *mut *mut ::std::os::raw::c_char,
+        value: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecDataSetAuxDataGetNumItems(
+        fileHandle: *mut ::std::os::raw::c_void,
+        numItems: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecDataSetGetNumVars(fileHandle: *mut ::std::os::raw::c_void, numVars: *mut i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecDataSetGetNumZones(
+        fileHandle: *mut ::std::os::raw::c_void,
+        numZones: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecDataSetGetTitle(
+        fileHandle: *mut ::std::os::raw::c_void,
+        title: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecFileGetType(fileHandle: *mut ::std::os::raw::c_void, fileType: *mut i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecFileReaderClose(fileHandle: *mut *mut ::std::os::raw::c_void) -> i32;
+}
+
+extern "C" {
+    pub fn tecFileReaderOpen(
+        fileName: *const ::std::os::raw::c_char,
+        fileHandle: *mut *mut ::std::os::raw::c_void,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomArrowheadGetAngle(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        angle: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomArrowheadGetAttach(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        attachment: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomArrowheadGetSize(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        arrowheadSize: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomArrowheadGetStyle(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        arrowheadStyle: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomCircleGetRadius(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        radius: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomEllipseGetNumPoints(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        numEllipsePoints: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomEllipseGetSize(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        horizontalAxis: *mut f64,
+        verticalAxis: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetAnchorPos(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        x: *mut f64,
+        y: *mut f64,
+        z: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetClipping(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        clipping: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetColor(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        color: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetCoordMode(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        coordMode: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetFillColor(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        fillColor: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetLinePattern(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        linePattern: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetLineThickness(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        lineThickness: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetMacroFunctionCmd(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        macroFunctionCmd: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetNumGeoms(fileHandle: *mut ::std::os::raw::c_void, numGeoms: *mut i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetPatternLength(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        patternLength: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetScope(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        scope: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetType(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        type_: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomGetZone(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        zone: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomIsAttached(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        isAttached: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomIsFilled(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        isFilled: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomLineGetPoint(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        segment: i32,
+        index: i32,
+        x: *mut f64,
+        y: *mut f64,
+        z: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomLineGetSegmentCount(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        segmentCount: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomLineSegmentGetPointCount(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        segment: i32,
+        pointCount: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomRectangleGetSize(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        width: *mut f64,
+        height: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecGeomSquareGetSize(
+        fileHandle: *mut ::std::os::raw::c_void,
+        geom: i32,
+        size: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecStringFree(string: *mut *mut ::std::os::raw::c_char);
+}
+
+extern "C" {
+    pub fn tecStringLength(string: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextBoxGetColor(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        boxColor: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextBoxGetFillColor(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        boxFillColor: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextBoxGetLineThickness(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        boxLineThickness: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextBoxGetMargin(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        boxMargin: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextBoxGetType(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        boxType: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetAnchor(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        anchor: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetAnchorPos(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        x: *mut f64,
+        y: *mut f64,
+        z: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetAngle(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        angle: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetClipping(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        clipping: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetColor(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        color: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetCoordMode(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        coordMode: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetHeight(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        height: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetLineSpacing(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        lineSpacing: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetMacroFunctionCmd(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        macroFunctionCmd: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetNumTexts(fileHandle: *mut ::std::os::raw::c_void, numTexts: *mut i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetScope(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        scope: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetSizeUnits(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        sizeUnits: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetString(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        string: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetTypeface(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        typeface: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextGetZone(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        zone: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextIsAttached(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        isAttached: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextIsBold(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        isBold: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecTextIsItalic(
+        fileHandle: *mut ::std::os::raw::c_void,
+        text: i32,
+        isItalic: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecVarAuxDataGetItem(
+        fileHandle: *mut ::std::os::raw::c_void,
+        var: i32,
+        whichItem: i32,
+        name: *mut *mut ::std::os::raw::c_char,
+        value: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecVarAuxDataGetNumItems(
+        fileHandle: *mut ::std::os::raw::c_void,
+        var: i32,
+        numItems: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecVarGetName(
+        fileHandle: *mut ::std::os::raw::c_void,
+        var: i32,
+        name: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecVarIsEnabled(
+        fileHandle: *mut ::std::os::raw::c_void,
+        var: i32,
+        isEnabled: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneAuxDataGetItem(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        whichItem: i32,
+        name: *mut *mut ::std::os::raw::c_char,
+        value: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneAuxDataGetNumItems(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        numItems: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneConnectivityGetSharedZone(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        sharedZone: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneFaceNbrGetConnections(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        connections: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneFaceNbrGetConnections64(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        connections: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneFaceNbrGetMode(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        mode: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneFaceNbrGetNumConnections(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        numConnections: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneFaceNbrGetNumValues(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        numValues: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneFaceNbrsAre64Bit(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        are64Bit: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneGetIJK(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        iMax: *mut i64,
+        jMax: *mut i64,
+        kMax: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneGetParentZone(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        parentZone: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneGetSolutionTime(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        solutionTime: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneGetStrandID(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        strandID: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneGetTitle(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        title: *mut *mut ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneGetType(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        type_: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneIsEnabled(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        isEnabled: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneNodeMapGet(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        startCell: i64,
+        numCells: i64,
+        nodeMap: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneNodeMapGet64(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        startCell: i64,
+        numCells: i64,
+        nodeMap: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneNodeMapGetNumValues(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        numCells: i64,
+        numValues: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneNodeMapIs64Bit(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        is64Bit: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetBoundaryConnectionCounts(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        startConnection: i64,
+        numConnections: i64,
+        connectionCounts: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetBoundaryConnections(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        startConnection: i64,
+        numConnections: i64,
+        connectedElements: *mut i32,
+        connectedZones: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetFaceElems(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        startFace: i64,
+        numFaces: i64,
+        leftElems: *mut i32,
+        rightElems: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetFaceNodeCounts(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        startFace: i64,
+        numFaces: i64,
+        nodeCounts: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetFaceNodes(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        startFace: i64,
+        numFaces: i64,
+        faceNodes: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetNumConnectedBoundaryFaces(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        numFaces: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetTotalNumFaceNodes(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        numNodes: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZonePolyGetTotalNumBoundaryConnections(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        numConnections: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetDoubleValues(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        startIndex: i64,
+        numValues: i64,
+        values: *mut f64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetFloatValues(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        startIndex: i64,
+        numValues: i64,
+        values: *mut f32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetInt16Values(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        startIndex: i64,
+        numValues: i64,
+        values: *mut i16,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetInt32Values(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        startIndex: i64,
+        numValues: i64,
+        values: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetNumValues(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        numValues: *mut i64,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetSharedZone(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        sharedZone: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetType(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        type_: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetUInt8Values(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        startIndex: i64,
+        numValues: i64,
+        values: *mut u8,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarGetValueLocation(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        location: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecZoneVarIsPassive(
+        fileHandle: *mut ::std::os::raw::c_void,
+        zone: i32,
+        var: i32,
+        isPassive: *mut i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecini142(
+        Title: *const ::std::os::raw::c_char,
+        Variables: *const ::std::os::raw::c_char,
+        FName: *const ::std::os::raw::c_char,
+        ScratchDir: *const ::std::os::raw::c_char,
+        FileFormat: *const i32,
+        FileType: *const i32,
+        Debug: *const i32,
+        VIsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczne142(
+        ZoneTitle: *const ::std::os::raw::c_char,
+        ZoneType: *const i32,
+        IMxOrNumPts: *const i32,
+        JMxOrNumElements: *const i32,
+        KMxOrNumFaces: *const i32,
+        ICellMx: *const i32,
+        JCellMx: *const i32,
+        KCellMx: *const i32,
+        SolutionTime: *const f64,
+        StrandID: *const i32,
+        ParentZone: *const i32,
+        IsBlock: *const i32,
+        NumFaceConnections: *const i32,
+        FaceNeighborMode: *const i32,
+        TotalNumFaceNodes: *const i32,
+        NumConnectedBoundaryFaces: *const i32,
+        TotalNumBoundaryConnections: *const i32,
+        PassiveVarList: *const i32,
+        ValueLocation: *const i32,
+        ShareVarFromZone: *const i32,
+        ShareConnectivityFromZone: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecdat142(
+        N: *const i32,
+        FieldData: *const ::std::os::raw::c_void,
+        IsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecdatd142(N: *const i32, FieldData: *const f64) -> i32;
+}
+
+extern "C" {
+    pub fn tecdatf142(N: *const i32, FieldData: *const f32) -> i32;
+}
+
+extern "C" {
+    pub fn tecnod142(NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecnode142(N: *const i32, NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecflush142(NumZonesToRetain: *const i32, ZonesToRetain: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecend142() -> i32;
+}
+
+extern "C" {
+    pub fn teclab142(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecusr142(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecgeo142(
+        XPos: *const f64,
+        YPos: *const f64,
+        ZPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        Color: *const i32,
+        FillColor: *const i32,
+        IsFilled: *const i32,
+        GeomType: *const i32,
+        LinePattern: *const i32,
+        PatternLength: *const f64,
+        LineThickness: *const f64,
+        NumEllipsePts: *const i32,
+        ArrowheadStyle: *const i32,
+        ArrowheadAttachment: *const i32,
+        ArrowheadSize: *const f64,
+        ArrowheadAngle: *const f64,
+        Scope: *const i32,
+        Clipping: *const i32,
+        NumSegments: *const i32,
+        NumSegPts: *const i32,
+        XGeomData: *const f32,
+        YGeomData: *const f32,
+        ZGeomData: *const f32,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tectxt142(
+        XOrThetaPos: *const f64,
+        YOrRPos: *const f64,
+        ZOrUnusedPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        BFont: *const i32,
+        FontHeightUnits: *const i32,
+        FontHeight: *const f64,
+        BoxType: *const i32,
+        BoxMargin: *const f64,
+        BoxLineThickness: *const f64,
+        BoxColor: *const i32,
+        BoxFillColor: *const i32,
+        Angle: *const f64,
+        Anchor: *const i32,
+        LineSpacing: *const f64,
+        TextColor: *const i32,
+        Scope: *const i32,
+        Clipping: *const i32,
+        String: *const ::std::os::raw::c_char,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecfil142(F: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecforeign142(OutputForeignByteOrder: *const i32);
+}
+
+extern "C" {
+    pub fn tecauxstr142(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczauxstr142(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecvauxstr142(
+        Var: *const i32,
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecface142(FaceConnections: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecpoly142(
+        FaceNodeCounts: *const i32,
+        FaceNodes: *const i32,
+        FaceLeftElems: *const i32,
+        FaceRightElems: *const i32,
+        FaceBndryConnectionCounts: *const i32,
+        FaceBndryConnectionElems: *const i32,
+        FaceBndryConnectionZones: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecpolyface142(
+        NumFaces: *const i32,
+        FaceNodeCounts: *const i32,
+        FaceNodes: *const i32,
+        FaceLeftElems: *const i32,
+        FaceRightElems: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecpolybconn142(
+        NumBndryFaces: *const i32,
+        FaceBndryConnectionCounts: *const i32,
+        FaceBndryConnectionElems: *const i32,
+        FaceBndryConnectionZones: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecfeptn142(
+        partition: *const i32,
+        numnodes: *const i32,
+        numcells: *const i32,
+        ngnodes: *const i32,
+        gnodes: *const i32,
+        gnpartitions: *const i32,
+        gnpnodes: *const i32,
+        ngcells: *const i32,
+        gcells: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecijkptn142(
+        partition: *const i32,
+        imin: *const i32,
+        jmin: *const i32,
+        kmin: *const i32,
+        imax: *const i32,
+        jmax: *const i32,
+        kmax: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecmpiinit142(communicator: *mut ::std::os::raw::c_void, mainrank: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecznemap142(npartitions: *const i32, ptnranks: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecini112(
+        Title: *const ::std::os::raw::c_char,
+        Variables: *const ::std::os::raw::c_char,
+        FName: *const ::std::os::raw::c_char,
+        ScratchDir: *const ::std::os::raw::c_char,
+        FileType: *const i32,
+        Debug: *const i32,
+        VIsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczne112(
+        ZoneTitle: *const ::std::os::raw::c_char,
+        ZoneType: *const i32,
+        IMxOrNumPts: *const i32,
+        JMxOrNumElements: *const i32,
+        KMxOrNumFaces: *const i32,
+        ICellMx: *const i32,
+        JCellMx: *const i32,
+        KCellMx: *const i32,
+        SolutionTime: *const f64,
+        StrandID: *const i32,
+        ParentZone: *const i32,
+        IsBlock: *const i32,
+        NumFaceConnections: *const i32,
+        FaceNeighborMode: *const i32,
+        TotalNumFaceNodes: *const i32,
+        NumConnectedBoundaryFaces: *const i32,
+        TotalNumBoundaryConnections: *const i32,
+        PassiveVarList: *const i32,
+        ValueLocation: *const i32,
+        ShareVarFromZone: *const i32,
+        ShareConnectivityFromZone: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecdat112(
+        N: *const i32,
+        FieldData: *const ::std::os::raw::c_void,
+        IsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecnod112(NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecnode112(N: *const i32, NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecend112() -> i32;
+}
+
+extern "C" {
+    pub fn teclab112(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecusr112(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecgeo112(
+        XPos: *const f64,
+        YPos: *const f64,
+        ZPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        Color: *const i32,
+        FillColor: *const i32,
+        IsFilled: *const i32,
+        GeomType: *const i32,
+        LinePattern: *const i32,
+        PatternLength: *const f64,
+        LineThickness: *const f64,
+        NumEllipsePts: *const i32,
+        ArrowheadStyle: *const i32,
+        ArrowheadAttachment: *const i32,
+        ArrowheadSize: *const f64,
+        ArrowheadAngle: *const f64,
+        Scope: *const i32,
+        Clipping: *const i32,
+        NumSegments: *const i32,
+        NumSegPts: *const i32,
+        XGeomData: *const f32,
+        YGeomData: *const f32,
+        ZGeomData: *const f32,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tectxt112(
+        XOrThetaPos: *const f64,
+        YOrRPos: *const f64,
+        ZOrUnusedPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        BFont: *const i32,
+        FontHeightUnits: *const i32,
+        FontHeight: *const f64,
+        BoxType: *const i32,
+        BoxMargin: *const f64,
+        BoxLineThickness: *const f64,
+        BoxColor: *const i32,
+        BoxFillColor: *const i32,
+        Angle: *const f64,
+        Anchor: *const i32,
+        LineSpacing: *const f64,
+        TextColor: *const i32,
+        Scope: *const i32,
+        Clipping: *const i32,
+        String: *const ::std::os::raw::c_char,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecfil112(F: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecforeign112(OutputForeignByteOrder: *const i32);
+}
+
+extern "C" {
+    pub fn tecauxstr112(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczauxstr112(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecvauxstr112(
+        Var: *const i32,
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecface112(FaceConnections: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecpoly112(
+        FaceNodeCounts: *const i32,
+        FaceNodes: *const i32,
+        FaceLeftElems: *const i32,
+        FaceRightElems: *const i32,
+        FaceBndryConnectionCounts: *const i32,
+        FaceBndryConnectionElems: *const i32,
+        FaceBndryConnectionZones: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecpolyface112(
+        NumFaces: *const i32,
+        FaceNodeCounts: *const i32,
+        FaceNodes: *const i32,
+        FaceLeftElems: *const i32,
+        FaceRightElems: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecpolybconn112(
+        NumBndryFaces: *const i32,
+        FaceBndryConnectionCounts: *const i32,
+        FaceBndryConnectionElems: *const i32,
+        FaceBndryConnectionZones: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecini111(
+        Title: *const ::std::os::raw::c_char,
+        Variables: *const ::std::os::raw::c_char,
+        FName: *const ::std::os::raw::c_char,
+        ScratchDir: *const ::std::os::raw::c_char,
+        FileType: *const i32,
+        Debug: *const i32,
+        VIsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczne111(
+        ZoneTitle: *const ::std::os::raw::c_char,
+        ZoneType: *const i32,
+        IMxOrNumPts: *const i32,
+        JMxOrNumElements: *const i32,
+        KMxOrNumFaces: *const i32,
+        ICellMx: *const i32,
+        JCellMx: *const i32,
+        KCellMx: *const i32,
+        SolutionTime: *const f64,
+        StrandID: *const i32,
+        ParentZone: *const i32,
+        IsBlock: *const i32,
+        NumFaceConnections: *const i32,
+        FaceNeighborMode: *const i32,
+        TotalNumFaceNodes: *const i32,
+        NumConnectedBoundaryFaces: *const i32,
+        TotalNumBoundaryConnections: *const i32,
+        PassiveVarList: *const i32,
+        ValueLocation: *const i32,
+        ShareVarFromZone: *const i32,
+        ShareConnectivityFromZone: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecdat111(
+        N: *const i32,
+        FieldData: *const ::std::os::raw::c_void,
+        IsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecnod111(NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecend111() -> i32;
+}
+
+extern "C" {
+    pub fn teclab111(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecusr111(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecgeo111(
+        XPos: *const f64,
+        YPos: *const f64,
+        ZPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        Color: *const i32,
+        FillColor: *const i32,
+        IsFilled: *const i32,
+        GeomType: *const i32,
+        LinePattern: *const i32,
+        PatternLength: *const f64,
+        LineThickness: *const f64,
+        NumEllipsePts: *const i32,
+        ArrowheadStyle: *const i32,
+        ArrowheadAttachment: *const i32,
+        ArrowheadSize: *const f64,
+        ArrowheadAngle: *const f64,
+        Scope: *const i32,
+        Clipping: *const i32,
+        NumSegments: *const i32,
+        NumSegPts: *const i32,
+        XGeomData: *const f32,
+        YGeomData: *const f32,
+        ZGeomData: *const f32,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tectxt111(
+        XOrThetaPos: *const f64,
+        YOrRPos: *const f64,
+        ZOrUnusedPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        BFont: *const i32,
+        FontHeightUnits: *const i32,
+        FontHeight: *const f64,
+        BoxType: *const i32,
+        BoxMargin: *const f64,
+        BoxLineThickness: *const f64,
+        BoxColor: *const i32,
+        BoxFillColor: *const i32,
+        Angle: *const f64,
+        Anchor: *const i32,
+        LineSpacing: *const f64,
+        TextColor: *const i32,
+        Scope: *const i32,
+        Clipping: *const i32,
+        String: *const ::std::os::raw::c_char,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecfil111(F: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecforeign111(OutputForeignByteOrder: *const i32);
+}
+
+extern "C" {
+    pub fn tecauxstr111(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczauxstr111(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecvauxstr111(
+        Var: *const i32,
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecface111(FaceConnections: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecpoly111(
+        FaceNodeCounts: *const i32,
+        FaceNodes: *const i32,
+        FaceLeftElems: *const i32,
+        FaceRightElems: *const i32,
+        FaceBndryConnectionCounts: *const i32,
+        FaceBndryConnectionElems: *const i32,
+        FaceBndryConnectionZones: *const i16,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecini110(
+        Title: *const ::std::os::raw::c_char,
+        Variables: *const ::std::os::raw::c_char,
+        FName: *const ::std::os::raw::c_char,
+        ScratchDir: *const ::std::os::raw::c_char,
+        Debug: *const i32,
+        VIsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczne110(
+        ZoneTitle: *const ::std::os::raw::c_char,
+        ZoneType: *const i32,
+        IMxOrNumPts: *const i32,
+        JMxOrNumElements: *const i32,
+        KMxOrNumFaces: *const i32,
+        ICellMx: *const i32,
+        JCellMx: *const i32,
+        KCellMx: *const i32,
+        SolutionTime: *const f64,
+        StrandID: *const i32,
+        ParentZone: *const i32,
+        IsBlock: *const i32,
+        NumFaceConnections: *const i32,
+        FaceNeighborMode: *const i32,
+        PassiveVarList: *const i32,
+        ValueLocation: *const i32,
+        ShareVarFromZone: *const i32,
+        ShareConnectivityFromZone: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecdat110(
+        N: *const i32,
+        FieldData: *const ::std::os::raw::c_void,
+        IsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecnod110(NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecend110() -> i32;
+}
+
+extern "C" {
+    pub fn teclab110(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecusr110(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecgeo110(
+        XPos: *const f64,
+        YPos: *const f64,
+        ZPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        Color: *const i32,
+        FillColor: *const i32,
+        IsFilled: *const i32,
+        GeomType: *const i32,
+        LinePattern: *const i32,
+        PatternLength: *const f64,
+        LineThickness: *const f64,
+        NumEllipsePts: *const i32,
+        ArrowheadStyle: *const i32,
+        ArrowheadAttachment: *const i32,
+        ArrowheadSize: *const f64,
+        ArrowheadAngle: *const f64,
+        Scope: *const i32,
+        Clipping: *const i32,
+        NumSegments: *const i32,
+        NumSegPts: *const i32,
+        XGeomData: *const f32,
+        YGeomData: *const f32,
+        ZGeomData: *const f32,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tectxt110(
+        XOrThetaPos: *const f64,
+        YOrRPos: *const f64,
+        ZOrUnusedPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        BFont: *const i32,
+        FontHeightUnits: *const i32,
+        FontHeight: *const f64,
+        BoxType: *const i32,
+        BoxMargin: *const f64,
+        BoxLineThickness: *const f64,
+        BoxColor: *const i32,
+        BoxFillColor: *const i32,
+        Angle: *const f64,
+        Anchor: *const i32,
+        LineSpacing: *const f64,
+        TextColor: *const i32,
+        Scope: *const i32,
+        Clipping: *const i32,
+        String: *const ::std::os::raw::c_char,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecforeign110(OutputForeignByteOrder: *const i32);
+}
+
+extern "C" {
+    pub fn tecfil110(F: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecauxstr110(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczauxstr110(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecvauxstr110(
+        Var: *const i32,
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecface110(FaceConnections: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecini100(
+        Title: *const ::std::os::raw::c_char,
+        Variables: *const ::std::os::raw::c_char,
+        FName: *const ::std::os::raw::c_char,
+        ScratchDir: *const ::std::os::raw::c_char,
+        Debug: *const i32,
+        VIsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczne100(
+        ZoneTitle: *const ::std::os::raw::c_char,
+        ZoneType: *const i32,
+        IMxOrNumPts: *const i32,
+        JMxOrNumElements: *const i32,
+        KMxOrNumFaces: *const i32,
+        ICellMx: *const i32,
+        JCellMx: *const i32,
+        KCellMx: *const i32,
+        IsBlock: *const i32,
+        NumFaceConnections: *const i32,
+        FaceNeighborMode: *const i32,
+        ValueLocation: *const i32,
+        ShareVarFromZone: *const i32,
+        ShareConnectivityFromZone: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecdat100(
+        N: *const i32,
+        FieldData: *const ::std::os::raw::c_void,
+        IsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecnod100(NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecend100() -> i32;
+}
+
+extern "C" {
+    pub fn teclab100(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecusr100(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecgeo100(
+        XPos: *const f64,
+        YPos: *const f64,
+        ZPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        Color: *const i32,
+        FillColor: *const i32,
+        IsFilled: *const i32,
+        GeomType: *const i32,
+        LinePattern: *const i32,
+        PatternLength: *const f64,
+        LineThickness: *const f64,
+        NumEllipsePts: *const i32,
+        ArrowheadStyle: *const i32,
+        ArrowheadAttachment: *const i32,
+        ArrowheadSize: *const f64,
+        ArrowheadAngle: *const f64,
+        Scope: *const i32,
+        Clipping: *const i32,
+        NumSegments: *const i32,
+        NumSegPts: *const i32,
+        XGeomData: *const f32,
+        YGeomData: *const f32,
+        ZGeomData: *const f32,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tectxt100(
+        XOrThetaPos: *const f64,
+        YOrRPos: *const f64,
+        ZOrUnusedPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        BFont: *const i32,
+        FontHeightUnits: *const i32,
+        FontHeight: *const f64,
+        BoxType: *const i32,
+        BoxMargin: *const f64,
+        BoxLineThickness: *const f64,
+        BoxColor: *const i32,
+        BoxFillColor: *const i32,
+        Angle: *const f64,
+        Anchor: *const i32,
+        LineSpacing: *const f64,
+        TextColor: *const i32,
+        Scope: *const i32,
+        Clipping: *const i32,
+        String: *const ::std::os::raw::c_char,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecfil100(F: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecforeign100(OutputForeignByteOrder: *const i32);
+}
+
+extern "C" {
+    pub fn tecauxstr100(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczauxstr100(
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecvauxstr100(
+        Var: *const i32,
+        Name: *const ::std::os::raw::c_char,
+        Value: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecface100(FaceConnections: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecini(
+        Title: *const ::std::os::raw::c_char,
+        Variables: *const ::std::os::raw::c_char,
+        FName: *const ::std::os::raw::c_char,
+        ScratchDir: *const ::std::os::raw::c_char,
+        Debug: *const i32,
+        VIsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn teczne(
+        ZoneTitle: *const ::std::os::raw::c_char,
+        IMx: *const i32,
+        JMx: *const i32,
+        KMx: *const i32,
+        ZFormat: *const ::std::os::raw::c_char,
+        DupList: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecdat(
+        N: *const i32,
+        FieldData: *const ::std::os::raw::c_void,
+        IsDouble: *const i32,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecnod(NData: *const i32) -> i32;
+}
+
+extern "C" {
+    pub fn tecend() -> i32;
+}
+
+extern "C" {
+    pub fn teclab(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecusr(S: *const ::std::os::raw::c_char) -> i32;
+}
+
+extern "C" {
+    pub fn tecgeo(
+        XPos: *const f64,
+        YPos: *const f64,
+        ZPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        Color: *const i32,
+        FillColor: *const i32,
+        IsFilled: *const i32,
+        GeomType: *const i32,
+        LinePattern: *const i32,
+        PatternLength: *const f64,
+        LineThickness: *const f64,
+        NumEllipsePts: *const i32,
+        ArrowheadStyle: *const i32,
+        ArrowheadAttachment: *const i32,
+        ArrowheadSize: *const f64,
+        ArrowheadAngle: *const f64,
+        Scope: *const i32,
+        NumSegments: *const i32,
+        NumSegPts: *const i32,
+        XGeomData: *const f32,
+        YGeomData: *const f32,
+        ZGeomData: *const f32,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tectxt(
+        XPos: *const f64,
+        YPos: *const f64,
+        PosCoordMode: *const i32,
+        AttachToZone: *const i32,
+        Zone: *const i32,
+        BFont: *const i32,
+        FontHeightUnits: *const i32,
+        FontHeight: *const f64,
+        BoxType: *const i32,
+        BoxMargin: *const f64,
+        BoxLineThickness: *const f64,
+        BoxColor: *const i32,
+        BoxFillColor: *const i32,
+        Angle: *const f64,
+        Anchor: *const i32,
+        LineSpacing: *const f64,
+        TextColor: *const i32,
+        Scope: *const i32,
+        Text: *const ::std::os::raw::c_char,
+        mfc: *const ::std::os::raw::c_char,
+    ) -> i32;
+}
+
+extern "C" {
+    pub fn tecfil(F: *const i32) -> i32;
+}
