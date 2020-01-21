@@ -1,6 +1,11 @@
 use std::env;
 
 fn main() {
+    #[cfg(any(test))]
+    {
+        println!("cargo:warning=Link dynamicly becouse of tests");
+        println!(r"cargo:rustc-link-search=shared=C:\Program Files\Tecplot\Tecplot 360 EX 2018 R2\lib");
+    }
     #[cfg(all(feature = "link_static"))]
     {
         //println!("cargo:rustc-link-search=native=tecio");
@@ -25,6 +30,7 @@ fn main() {
         println!("cargo:warning=Asked to link dynamicly");
         println!("cargo:rustc-link-lib=dylib=tecio");
     }
+
 }
 
 fn emit_std_cpp_link() {

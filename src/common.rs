@@ -1,4 +1,4 @@
-use crate::TecReader;
+use crate::{TecReader, PltParseError};
 use libc::c_char;
 use std::convert::From;
 use std::ffi::{c_void, CString, OsStr};
@@ -21,15 +21,35 @@ pub enum ZoneType {
     FEPolygon = 6,
     FEPolyhedron = 7,
 }
+impl ZoneType{
+    pub fn is_fe(&self) -> bool {
+        use ZoneType::*;
+        match self{
+            FELine | FETriangle | FEQuad | FETetra | FEBrick | FEPolygon | FEPolyhedron  => true,
+            _ => false
+        }
+    }
+}
+
+impl From<i32> for ZoneType{
+    fn from(value: i32) -> Self {
+        if value <= 7 && value >= 0{
+            unsafe { std::mem::transmute(value) }
+        }else{
+            panic!("Wrong integer for zone type!")
+        }
+    }
+}
 
 #[derive(Debug, Copy, Clone)]
 #[repr(i32)]
 pub enum TecDataType {
-    F64 = 1,
-    F32 = 2,
+    F32 = 1,
+    F64 = 2,
     I32 = 3,
     I16 = 4,
     I8 = 5,
+    I1 = 6,
 }
 #[derive(Debug, Clone)]
 pub enum TecData<'a> {
@@ -55,6 +75,18 @@ pub enum FileType {
     GridOnly,
     SolutionOnly(*mut c_void),
 }
+
+impl From<i32> for FileType{
+    fn from(i: i32) -> Self {
+        match i{
+            0 => Self::Full,
+            1 => Self::GridOnly,
+            2 => Self::SolutionOnly(null_mut()),
+            _ => panic!("Wrong file type"),
+        }
+    }
+}
+
 impl FileType {
     pub fn as_i32(&self) -> i32 {
         match self {
@@ -75,12 +107,21 @@ pub enum ValueLocation {
 #[derive(Debug, Copy, Clone)]
 #[repr(i32)]
 pub enum FaceNeighborMode {
-    LocalOneToOne,
+    LocalOneToOne = 0,
     LocalOneToMany,
     GlobalOneToOne,
     GlobalOneToMany,
 }
 
+impl From<i32> for FaceNeighborMode{
+    fn from(value: i32) -> Self {
+        if value <= 3 && value >= 0{
+            unsafe { std::mem::transmute(value) }
+        }else{
+            panic!("Wrong integer for FaceNeighborMode!")
+        }
+    }
+}
 /*pub struct TecZone{
     pub name: String,
     pub zone_type: ZoneType,
@@ -93,7 +134,7 @@ pub enum FaceNeighborMode {
 
 pub fn try_err<S: ToString>(er: i32, message: S) -> Result<()> {
     if er != 0 {
-        Err(TecioError {
+        Err(TecioError::Other {
             message: message.to_string(),
             code: er,
         })
@@ -102,7 +143,7 @@ pub fn try_err<S: ToString>(er: i32, message: S) -> Result<()> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Dataset {
     pub num_variables: i32,
 
@@ -208,25 +249,47 @@ pub trait Zone {
 }
 
 #[derive(Debug)]
-pub struct TecioError {
-    pub message: String,
-    pub code: i32,
+pub enum TecioError{
+    Other {
+        message: String,
+        code: i32,
+    },
+    FFIError {
+
+    },
+    NulError(std::ffi::NulError),
+    StringError(std::ffi::IntoStringError),
+    WrongFileExtension,
+    IOError(std::io::Error),
+    ParseError(PltParseError),
+    NomErr(nom::Err<PltParseError>),
+}
+
+impl From<PltParseError> for TecioError {
+    fn from(t: PltParseError) -> Self {
+        TecioError::ParseError(t)
+    }
+}
+impl From<nom::Err<PltParseError>> for TecioError{
+    fn from(e: nom::Err<PltParseError>) -> Self {
+        Self::NomErr(e)
+    }
+}
+
+impl From<std::io::Error> for TecioError {
+    fn from(t: std::io::Error) -> Self {
+        TecioError::IOError(t)
+    }
 }
 
 impl From<std::ffi::NulError> for TecioError {
     fn from(t: std::ffi::NulError) -> Self {
-        TecioError {
-            message: "File name contains null characters, cannot convert to CString".to_owned(),
-            code: -1,
-        }
+        TecioError::NulError(t)
     }
 }
 
 impl From<std::ffi::IntoStringError> for TecioError {
     fn from(t: std::ffi::IntoStringError) -> Self {
-        TecioError {
-            message: "File name contains some characters, cannot convert to String".to_owned(),
-            code: -1,
-        }
+        TecioError::StringError(t)
     }
 }

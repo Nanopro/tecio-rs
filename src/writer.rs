@@ -86,7 +86,7 @@ impl TecWriter {
                     ),
                 },
                 FileFormat::Binary => {
-                    return Err(TecioError {
+                    return Err(TecioError::Other {
                         message: format!(
                             "Unsupported file format {:?}! Supported types: [Subzone]",
                             config.file_format
@@ -98,7 +98,7 @@ impl TecWriter {
         };
 
         if er != 0 {
-            return Err(TecioError {
+            return Err(TecioError::Other {
                 message: "Error opening file.".to_owned(),
                 code: er,
             });
@@ -107,7 +107,7 @@ impl TecWriter {
         er = unsafe { bindings::tecFileSetDiagnosticsLevel(file_handle, config.diagnostics_level) };
 
         if er != 0 {
-            return Err(TecioError {
+            return Err(TecioError::Other {
                 message: "Error setting diagnostics level".to_owned(),
                 code: er,
             });
@@ -235,7 +235,7 @@ impl TecWriter {
             )
         };
         if er != 0 {
-            return Err(TecioError {
+            return Err(TecioError::Other {
                 message: "Error creating zone.".to_owned(),
                 code: er,
             });
@@ -243,7 +243,7 @@ impl TecWriter {
         er =
             unsafe { bindings::tecZoneSetUnsteadyOptions(self.file_handle, zone, time, strand_id) };
         if er != 0 {
-            return Err(TecioError {
+            return Err(TecioError::Other {
                 message: "Error setting zone's unsteady options.".to_owned(),
                 code: er,
             });
@@ -355,14 +355,14 @@ impl<'a> TecZoneWriter<'a> {
                     )?;
                 }
                 _ => {
-                    return Err(TecioError {
+                    return Err(TecioError::Other {
                         message: format!("Unsupported datatype for nodemap!"),
                         code: -1,
                     })
                 }
             },
             _ => {
-                return Err(TecioError {
+                return Err(TecioError::Other {
                     message: format!(
                         "Error, zone #{} of type {:?}, cannot contain nodemap!",
                         self.id,
