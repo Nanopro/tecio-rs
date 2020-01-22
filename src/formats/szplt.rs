@@ -5,10 +5,13 @@ use std::{
     ffi::{CString, OsStr, c_void},
     ptr::null_mut,
     path::{Path},
+    borrow::Cow,
 };
 use crate::common::{
-    try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType,
+    try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType, TecData
 };
+use nom::combinator::value;
+
 
 
 
@@ -132,13 +135,13 @@ impl SzpltFormat {
                     format!("Error reading zone strand id, num = {}.", i),
                 )?;
 
-                let mut locs = vec![ValueLocation::CellCentered; num_vars as usize];
+                let mut locs = vec![ValueLocation::Nodal; num_vars as usize];
                 for (v, loc) in locs.iter_mut().enumerate() {
                     try_err(
                         bindings::tecZoneVarGetValueLocation(
                             file_handle,
                             i,
-                            v as i32,
+                            v as i32 + 1,
                             loc as *mut ValueLocation as *mut i32,
                         ),
                         format!("Error reading zone locations"),
@@ -162,8 +165,6 @@ impl SzpltFormat {
                     | ZoneType::FETriangle
                     | ZoneType::FEBrick
                     | ZoneType::FELine
-                    | ZoneType::FEPolygon
-                    | ZoneType::FEPolyhedron
                     | ZoneType::FETetra => {
                         assert_eq!(k_max, 0);
                         TecZone::ClassicFE(ClassicFEZone {
@@ -205,7 +206,7 @@ impl SzpltFormat {
             try_err(
                 bindings::tecVarIsEnabled(self.file_handle, var_id, &mut is_enabled),
                 format!("Var {} is not enabled.", var_id),
-            )
+            )?
         };
 
         let mut data_type = 0;
@@ -213,172 +214,189 @@ impl SzpltFormat {
             try_err(
                 bindings::tecZoneVarGetType(self.file_handle, zone_id, var_id, &mut data_type),
                 format!("Cannot load var's {} data type.", var_id),
-            )
+            )?
         };
 
-        match data_type {
-            1 => Ok(TecDataType::F32),
-            2 => Ok(TecDataType::F64),
-            _ => Err(TecioError::Other {
-                message: format!("Unknown data type for var {}", var_id),
-                code: -1,
-            }),
-        }
+        Ok(TecDataType::from(data_type))
     }
 
-    pub fn get_data(&self, zone_id: i32, var_id: i32) -> Result<Vec<f32>> {
+    pub fn get_data(&self, zone_id: usize, var_id: usize) -> Result<TecData> {
         let mut num_values = -1;
         unsafe {
             try_err(
                 bindings::tecZoneVarGetNumValues(
                     self.file_handle,
-                    zone_id,
-                    var_id,
+                    zone_id as _,
+                    var_id as _,
                     &mut num_values,
                 ),
                 format!("Cannot get num values for var = {}.", var_id),
-            )
-        };
+            )?;
+        }
 
         let mut is_enabled = 0;
         unsafe {
             try_err(
-                bindings::tecVarIsEnabled(self.file_handle, var_id, &mut is_enabled),
+                bindings::tecVarIsEnabled(self.file_handle, var_id as _, &mut is_enabled),
                 format!("Var {} is not enabled.", var_id),
-            )
-        };
-        //println!("Is enabled: {}", is_enabled);
+            )?;
+        }
 
-        let mut vec = Vec::with_capacity(num_values as usize);
-        //assert_ne!(num_values, 0);
-
-        unsafe {
+        let mut data_type = 0;
+        unsafe{
             try_err(
-                bindings::tecZoneVarGetFloatValues(
-                    self.file_handle,
-                    zone_id,
-                    var_id,
-                    1,
-                    num_values,
-                    vec.as_mut_ptr(),
-                ),
-                format!(
-                    "Cannot get F32 values for var = {} of zone = {}.",
-                    var_id, zone_id
-                ),
-            )
-        };
+                bindings::tecZoneVarGetType(self.file_handle, zone_id as _, var_id as _, &mut data_type),
+                format!("Cannot get var's {} data type", var_id)
+            )?;
+        }
+        let data_type = TecDataType::from(data_type);
 
-        unsafe { vec.set_len(num_values as usize) };
-        Ok(vec)
+        match data_type{
+            TecDataType::F64 => {
+                let mut vec = vec![0.0; num_values as _];
+                unsafe {
+                    try_err(
+                        bindings::tecZoneVarGetDoubleValues(
+                            self.file_handle,
+                            zone_id as _,
+                            var_id as _,
+                            1,
+                            num_values,
+                            vec.as_mut_ptr(),
+                        ),
+                        format!(
+                            "Cannot get F64 values for var = {} of zone = {}.",
+                            var_id, zone_id
+                        ),
+                    )
+                };
+                Ok(TecData::F64(Cow::Owned(vec)))
+            },
+            TecDataType::F32 => {
+                let mut vec = vec![0.0; num_values as _];
+                unsafe {
+                    try_err(
+                        bindings::tecZoneVarGetFloatValues(
+                            self.file_handle,
+                            zone_id as _,
+                            var_id as _,
+                            1,
+                            num_values,
+                            vec.as_mut_ptr(),
+                        ),
+                        format!(
+                            "Cannot get F64 values for var = {} of zone = {}.",
+                            var_id, zone_id
+                        ),
+                    )
+                };
+                Ok(TecData::F32(Cow::Owned(vec)))
+            },
+            _ => unimplemented!()
+        }
+
+
+
     }
 
-    pub fn get_data_f64(&self, zone_id: i32, var_id: i32) -> Result<Vec<f64>> {
-        let mut num_values = -1;
-        unsafe {
-            try_err(
-                bindings::tecZoneVarGetNumValues(
-                    self.file_handle,
-                    zone_id,
-                    var_id,
-                    &mut num_values,
-                ),
-                format!("Cannot get num values for var = {}.", var_id),
-            )
-        };
 
-        let mut is_enabled = 0;
-        unsafe {
-            try_err(
-                bindings::tecVarIsEnabled(self.file_handle, var_id, &mut is_enabled),
-                format!("Var {} is not enabled.", var_id),
-            )
-        };
-        //println!("Is enabled: {}", is_enabled);
+    pub fn get_connectivity(&self, zone_id: i32) -> Result<Option<TecData>> {
+        match &self.zones[zone_id as usize - 1]{
+            TecZone::ClassicFE(zone) => {
+                let mut is_64b = 0;
 
-        let mut vec = Vec::with_capacity(num_values as usize);
-        //assert_ne!(num_values, 0);
+                try_err(
+                unsafe{
+                         bindings::tecZoneNodeMapIs64Bit(self.file_handle, zone_id, &mut is_64b)
+                    },
+                    format!("Could not get is zone map 64 bit flag")
+                )?;
 
-        unsafe {
-            try_err(
-                bindings::tecZoneVarGetDoubleValues(
-                    self.file_handle,
-                    zone_id,
-                    var_id,
-                    1,
-                    num_values,
-                    vec.as_mut_ptr(),
-                ),
-                format!(
-                    "Cannot get F64 values for var = {} of zone = {}.",
-                    var_id, zone_id
-                ),
-            )
-        };
-
-        unsafe { vec.set_len(num_values as usize) };
-        Ok(vec)
-    }
-
-    pub fn get_connectivity(&self, zone_id: i32) -> Result<Vec<u32>> {
-        let mut i_max: i64 = 0;
-        let mut j_max: i64 = 0;
-        let mut k_max: i64 = 0;
-        let mut er = unsafe {
-            bindings::tecZoneGetIJK(
-                self.file_handle,
-                zone_id,
-                &mut i_max,
-                &mut j_max,
-                &mut k_max,
-            )
-        };
-        if er != 0 {
-            return Err(TecioError::Other {
-                message: format!("Cannot get imax, jmax, kmax for zone = {}.", zone_id),
-                code: er,
-            });
+                match is_64b {
+                    0 => {
+                        let mut values = vec![0; zone.num_connections()];
+                        try_err(
+                            unsafe{
+                                bindings::tecZoneNodeMapGet(self.file_handle, zone_id, 1, zone.cells as _, values.as_mut_ptr())
+                            },
+                            format!("Could not get zone's {} nodemap", zone_id)
+                        )?;
+                        Ok(Some(TecData::I32(Cow::Owned(values))))
+                    },
+                    1 => {
+                        let mut values = vec![0; zone.num_connections()];
+                        try_err(
+                            unsafe{
+                                bindings::tecZoneNodeMapGet64(self.file_handle, zone_id, 1, zone.cells as _, values.as_mut_ptr())
+                            },
+                            format!("Could not get zone's {} nodemap", zone_id)
+                        )?;
+                        Ok(Some(TecData::I64(Cow::Owned(values))))
+                    },
+                    _ => unreachable!()
+                }
+            },
+            TecZone::Ordered(_) => Ok(None),
+            _ => unimplemented!()
         }
-
-        let mut num_connections = -1;
-        er = unsafe {
-            bindings::tecZoneNodeMapGetNumValues(
-                self.file_handle,
-                zone_id,
-                j_max,
-                &mut num_connections,
-            )
-        };
-
-        if er != 0 {
-            return Err(TecioError::Other {
-                message: format!("Cannot get num connections for zone = {}.", zone_id),
-                code: er,
-            });
-        }
-        let mut vec: Vec<u32> = Vec::with_capacity(num_connections as usize);
-        let buffer_ind = unsafe {
-            libc::malloc(std::mem::size_of::<u32>() * (num_connections) as usize) as *mut u32
-        };
-        er = unsafe {
-            bindings::tecZoneNodeMapGet(self.file_handle, zone_id, 1, j_max, buffer_ind as *mut i32)
-        };
-        if er != 0 {
-            return Err(TecioError::Other {
-                message: format!("Cannot get node map for zone = {}.", zone_id),
-                code: er,
-            });
-        }
-
-        unsafe {
-            vec = Vec::from_raw_parts(
-                buffer_ind,
-                num_connections as usize,
-                num_connections as usize,
-            )
-        };
-
-        Ok(vec)
+//        let mut i_max: i64 = 0;
+//        let mut j_max: i64 = 0;
+//        let mut k_max: i64 = 0;
+//        let mut er = unsafe {
+//            bindings::tecZoneGetIJK(
+//                self.file_handle,
+//                zone_id,
+//                &mut i_max,
+//                &mut j_max,
+//                &mut k_max,
+//            )
+//        };
+//        if er != 0 {
+//            return Err(TecioError::Other {
+//                message: format!("Cannot get imax, jmax, kmax for zone = {}.", zone_id),
+//                code: er,
+//            });
+//        }
+//
+//        let mut num_connections = -1;
+//        er = unsafe {
+//            bindings::tecZoneNodeMapGetNumValues(
+//                self.file_handle,
+//                zone_id,
+//                j_max,
+//                &mut num_connections,
+//            )
+//        };
+//
+//        if er != 0 {
+//            return Err(TecioError::Other {
+//                message: format!("Cannot get num connections for zone = {}.", zone_id),
+//                code: er,
+//            });
+//        }
+//        let mut vec: Vec<u32> = Vec::with_capacity(num_connections as usize);
+//        let buffer_ind = unsafe {
+//            libc::malloc(std::mem::size_of::<u32>() * (num_connections) as usize) as *mut u32
+//        };
+//        er = unsafe {
+//            bindings::tecZoneNodeMapGet(self.file_handle, zone_id, 1, j_max, buffer_ind as *mut i32)
+//        };
+//        if er != 0 {
+//            return Err(TecioError::Other {
+//                message: format!("Cannot get node map for zone = {}.", zone_id),
+//                code: er,
+//            });
+//        }
+//
+//        unsafe {
+//            vec = Vec::from_raw_parts(
+//                buffer_ind,
+//                num_connections as usize,
+//                num_connections as usize,
+//            )
+//        };
+//
+//        Ok(vec)
     }
 }
 

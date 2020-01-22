@@ -29,6 +29,17 @@ impl ZoneType{
             _ => false
         }
     }
+    pub fn num_nodes(&self) -> usize {
+        use ZoneType::*;
+        match self{
+            FELine => 2,
+            FETriangle => 3,
+            FEQuad => 4,
+            FETetra => 4,
+            FEBrick => 8,
+            _ => 0,
+        }
+    }
 }
 
 impl From<i32> for ZoneType{
@@ -51,7 +62,22 @@ pub enum TecDataType {
     I8 = 5,
     I1 = 6,
 }
-#[derive(Debug, Clone)]
+
+impl From<i32> for TecDataType{
+    fn from(i: i32) -> Self {
+        match i{
+            1 => Self::F32,
+            2 => Self::F64,
+            3 => Self::I32,
+            4 => Self::I16,
+            5 => Self::I8,
+            6 => Self::I1,
+            _ => panic!("Wrong data type!"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum TecData<'a> {
     F64(Cow<'a, [f64]>),
     F32(Cow<'a, [f32]>),
@@ -59,6 +85,61 @@ pub enum TecData<'a> {
     I32(Cow<'a, [i32]>),
     I16(Cow<'a, [i16]>),
     I8(Cow<'a, [i8]>),
+}
+
+impl<'a> TecData<'a>{
+    pub(crate) fn get(&self) -> TecData<'a>{
+        match self{
+            TecData::F64(ref cow) => {
+                match cow{
+                    Cow::Owned(ref owned) => {
+                        TecData::F64(Cow::Borrowed(
+                            unsafe{
+                                std::mem::transmute(owned.as_slice())
+                            }
+                        ))
+                    },
+                    Cow::Borrowed(bor) => TecData::F64(Cow::Borrowed(*bor)),
+                }
+            },
+            TecData::F32(ref cow) => {
+                match cow{
+                    Cow::Owned(ref owned) => {
+                        TecData::F32(Cow::Borrowed(
+                            unsafe{
+                                std::mem::transmute(owned.as_slice())
+                            }
+                        ))
+                    },
+                    Cow::Borrowed(bor) => TecData::F32(Cow::Borrowed(*bor)),
+                }
+            },
+            TecData::I32(ref cow) => {
+                match cow{
+                    Cow::Owned(ref owned) => {
+                        TecData::I32(Cow::Borrowed(
+                            unsafe{
+                                std::mem::transmute(owned.as_slice())
+                            }
+                        ))
+                    },
+                    Cow::Borrowed(bor) => TecData::I32(Cow::Borrowed(*bor)),
+                }
+            },
+            _ => unimplemented!()
+        }
+    }
+    pub fn len(&self) -> usize {
+        use TecData::*;
+        match self{
+            F64(c) => c.len(),
+            F32(c) => c.len(),
+            I64(c) => c.len(),
+            I32(c) => c.len(),
+            I16(c) => c.len(),
+            I8(c) => c.len(),
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -100,8 +181,8 @@ impl FileType {
 #[derive(Debug, Copy, Clone)]
 #[repr(i32)]
 pub enum ValueLocation {
-    CellCentered = 0,
-    Nodal,
+    Nodal = 0,
+    CellCentered = 1,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -166,7 +247,7 @@ impl Dataset {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TecZone {
     Ordered(OrderedZone),
     ClassicFE(ClassicFEZone),
@@ -196,9 +277,56 @@ impl TecZone {
             _ => false,
         }
     }
+    pub fn var_locs(&self) -> &[ValueLocation]{
+        match self{
+            TecZone::Ordered(z) => &z.var_location,
+            TecZone::ClassicFE(z) => &z.var_location,
+            _ => unimplemented!()
+        }
+    }
+    pub fn node_count(&self) -> usize {
+        match self{
+            TecZone::Ordered(z) => {
+                (z.i_max * z.j_max * z.k_max) as _
+            },
+            TecZone::ClassicFE(z) => z.nodes as _,
+            _ => unimplemented!()
+        }
+    }
+    pub fn cell_count(&self) -> usize {
+        match self{
+            TecZone::Ordered(z) => {
+                z.cell_count()
+            },
+            TecZone::ClassicFE(z) => z.cells as _,
+            _ => unimplemented!()
+        }
+    }
+    pub fn data_types(&self) -> Option<&[TecDataType]>{
+        match self{
+            TecZone::Ordered(z) => {
+                 z.var_types.as_ref().map(|v| v.as_slice())
+            },
+            TecZone::ClassicFE(z) => {
+                z.var_types.as_ref().map(|v| v.as_slice())
+            },
+            _ => unimplemented!()
+        }
+    }
+    pub fn data_types_mut(&mut self) -> &mut Option<Vec<TecDataType>>{
+        match self{
+            TecZone::Ordered(z) => {
+                &mut z.var_types
+            },
+            TecZone::ClassicFE(z) => {
+                &mut z.var_types
+            },
+            _ => unimplemented!()
+        }
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrderedZone {
     pub name: String,
     pub id: i32,
@@ -212,7 +340,25 @@ pub struct OrderedZone {
     pub var_types: Option<Vec<TecDataType>>,
 }
 
-impl OrderedZone {}
+impl OrderedZone {
+    fn cell_count(&self) -> usize{
+        (if self.i_max != 1 {
+            self.i_max - 1
+        } else{
+            1
+        } *
+        if self.j_max != 1{
+            self.j_max - 1
+        } else{
+            1
+        } *
+        if self.k_max != 1 {
+            self.k_max - 1
+        } else {
+            1
+        }) as _
+    }
+}
 impl Zone for OrderedZone {
     fn id(&self) -> i32 {
         self.id
@@ -225,7 +371,7 @@ impl Zone for OrderedZone {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ClassicFEZone {
     pub name: String,
     pub zone_type: ZoneType,
@@ -239,7 +385,14 @@ pub struct ClassicFEZone {
     pub var_location: Vec<ValueLocation>,
     pub var_types: Option<Vec<TecDataType>>,
 }
-#[derive(Debug)]
+
+impl ClassicFEZone{
+    pub fn num_connections(&self) -> usize {
+        self.cells as usize * self.zone_type.num_nodes()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct PolyFE {}
 
 pub trait Zone {
