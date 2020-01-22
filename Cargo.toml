@@ -10,7 +10,7 @@ build = "build/build.rs"
 [dependencies]
 libc = "0.2.51"
 nom = "5.1"
-widestring = "0.4"
+
 
 [build-dependencies.cmake]
 version = "0.1.42"

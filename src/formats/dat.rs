@@ -1,7 +1,3 @@
-
-
-pub enum DatParseError{
-
-}
+pub enum DatParseError {}
 
 pub struct DatFormat;

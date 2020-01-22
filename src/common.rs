@@ -1,11 +1,12 @@
-use crate::{TecReader, PltParseError};
+use crate::{PltParseError, TecReader};
 use libc::c_char;
-use std::convert::From;
-use std::ffi::{c_void, CString, OsStr};
-use std::ptr::null_mut;
-
-use std::borrow::Cow;
-use std::marker::PhantomData;
+use std::{
+    borrow::Cow,
+    convert::From,
+    ffi::{c_void, CString, OsStr},
+    marker::PhantomData,
+    ptr::null_mut,
+};
 
 pub type Result<T> = std::result::Result<T, TecioError>;
 
@@ -21,17 +22,17 @@ pub enum ZoneType {
     FEPolygon = 6,
     FEPolyhedron = 7,
 }
-impl ZoneType{
+impl ZoneType {
     pub fn is_fe(&self) -> bool {
         use ZoneType::*;
-        match self{
-            FELine | FETriangle | FEQuad | FETetra | FEBrick | FEPolygon | FEPolyhedron  => true,
-            _ => false
+        match self {
+            FELine | FETriangle | FEQuad | FETetra | FEBrick | FEPolygon | FEPolyhedron => true,
+            _ => false,
         }
     }
     pub fn num_nodes(&self) -> usize {
         use ZoneType::*;
-        match self{
+        match self {
             FELine => 2,
             FETriangle => 3,
             FEQuad => 4,
@@ -42,11 +43,11 @@ impl ZoneType{
     }
 }
 
-impl From<i32> for ZoneType{
+impl From<i32> for ZoneType {
     fn from(value: i32) -> Self {
-        if value <= 7 && value >= 0{
+        if value <= 7 && value >= 0 {
             unsafe { std::mem::transmute(value) }
-        }else{
+        } else {
             panic!("Wrong integer for zone type!")
         }
     }
@@ -63,9 +64,9 @@ pub enum TecDataType {
     I1 = 6,
 }
 
-impl From<i32> for TecDataType{
+impl From<i32> for TecDataType {
     fn from(i: i32) -> Self {
-        match i{
+        match i {
             1 => Self::F32,
             2 => Self::F64,
             3 => Self::I32,
@@ -87,51 +88,33 @@ pub enum TecData<'a> {
     I8(Cow<'a, [i8]>),
 }
 
-impl<'a> TecData<'a>{
-    pub(crate) fn get(&self) -> TecData<'a>{
-        match self{
-            TecData::F64(ref cow) => {
-                match cow{
-                    Cow::Owned(ref owned) => {
-                        TecData::F64(Cow::Borrowed(
-                            unsafe{
-                                std::mem::transmute(owned.as_slice())
-                            }
-                        ))
-                    },
-                    Cow::Borrowed(bor) => TecData::F64(Cow::Borrowed(*bor)),
-                }
+impl<'a> TecData<'a> {
+    pub(crate) fn get(&self) -> TecData<'a> {
+        match self {
+            TecData::F64(ref cow) => match cow {
+                Cow::Owned(ref owned) => TecData::F64(Cow::Borrowed(unsafe {
+                    std::mem::transmute(owned.as_slice())
+                })),
+                Cow::Borrowed(bor) => TecData::F64(Cow::Borrowed(*bor)),
             },
-            TecData::F32(ref cow) => {
-                match cow{
-                    Cow::Owned(ref owned) => {
-                        TecData::F32(Cow::Borrowed(
-                            unsafe{
-                                std::mem::transmute(owned.as_slice())
-                            }
-                        ))
-                    },
-                    Cow::Borrowed(bor) => TecData::F32(Cow::Borrowed(*bor)),
-                }
+            TecData::F32(ref cow) => match cow {
+                Cow::Owned(ref owned) => TecData::F32(Cow::Borrowed(unsafe {
+                    std::mem::transmute(owned.as_slice())
+                })),
+                Cow::Borrowed(bor) => TecData::F32(Cow::Borrowed(*bor)),
             },
-            TecData::I32(ref cow) => {
-                match cow{
-                    Cow::Owned(ref owned) => {
-                        TecData::I32(Cow::Borrowed(
-                            unsafe{
-                                std::mem::transmute(owned.as_slice())
-                            }
-                        ))
-                    },
-                    Cow::Borrowed(bor) => TecData::I32(Cow::Borrowed(*bor)),
-                }
+            TecData::I32(ref cow) => match cow {
+                Cow::Owned(ref owned) => TecData::I32(Cow::Borrowed(unsafe {
+                    std::mem::transmute(owned.as_slice())
+                })),
+                Cow::Borrowed(bor) => TecData::I32(Cow::Borrowed(*bor)),
             },
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
     pub fn len(&self) -> usize {
         use TecData::*;
-        match self{
+        match self {
             F64(c) => c.len(),
             F32(c) => c.len(),
             I64(c) => c.len(),
@@ -157,9 +140,9 @@ pub enum FileType {
     SolutionOnly(*mut c_void),
 }
 
-impl From<i32> for FileType{
+impl From<i32> for FileType {
     fn from(i: i32) -> Self {
-        match i{
+        match i {
             0 => Self::Full,
             1 => Self::GridOnly,
             2 => Self::SolutionOnly(null_mut()),
@@ -194,11 +177,11 @@ pub enum FaceNeighborMode {
     GlobalOneToMany,
 }
 
-impl From<i32> for FaceNeighborMode{
+impl From<i32> for FaceNeighborMode {
     fn from(value: i32) -> Self {
-        if value <= 3 && value >= 0{
+        if value <= 3 && value >= 0 {
             unsafe { std::mem::transmute(value) }
-        }else{
+        } else {
             panic!("Wrong integer for FaceNeighborMode!")
         }
     }
@@ -277,51 +260,39 @@ impl TecZone {
             _ => false,
         }
     }
-    pub fn var_locs(&self) -> &[ValueLocation]{
-        match self{
+    pub fn var_locs(&self) -> &[ValueLocation] {
+        match self {
             TecZone::Ordered(z) => &z.var_location,
             TecZone::ClassicFE(z) => &z.var_location,
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
     pub fn node_count(&self) -> usize {
-        match self{
-            TecZone::Ordered(z) => {
-                (z.i_max * z.j_max * z.k_max) as _
-            },
+        match self {
+            TecZone::Ordered(z) => (z.i_max * z.j_max * z.k_max) as _,
             TecZone::ClassicFE(z) => z.nodes as _,
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
     pub fn cell_count(&self) -> usize {
-        match self{
-            TecZone::Ordered(z) => {
-                z.cell_count()
-            },
+        match self {
+            TecZone::Ordered(z) => z.cell_count(),
             TecZone::ClassicFE(z) => z.cells as _,
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
-    pub fn data_types(&self) -> Option<&[TecDataType]>{
-        match self{
-            TecZone::Ordered(z) => {
-                 z.var_types.as_ref().map(|v| v.as_slice())
-            },
-            TecZone::ClassicFE(z) => {
-                z.var_types.as_ref().map(|v| v.as_slice())
-            },
-            _ => unimplemented!()
+    pub fn data_types(&self) -> Option<&[TecDataType]> {
+        match self {
+            TecZone::Ordered(z) => z.var_types.as_ref().map(|v| v.as_slice()),
+            TecZone::ClassicFE(z) => z.var_types.as_ref().map(|v| v.as_slice()),
+            _ => unimplemented!(),
         }
     }
-    pub fn data_types_mut(&mut self) -> &mut Option<Vec<TecDataType>>{
-        match self{
-            TecZone::Ordered(z) => {
-                &mut z.var_types
-            },
-            TecZone::ClassicFE(z) => {
-                &mut z.var_types
-            },
-            _ => unimplemented!()
+    pub fn data_types_mut(&mut self) -> &mut Option<Vec<TecDataType>> {
+        match self {
+            TecZone::Ordered(z) => &mut z.var_types,
+            TecZone::ClassicFE(z) => &mut z.var_types,
+            _ => unimplemented!(),
         }
     }
 }
@@ -341,22 +312,10 @@ pub struct OrderedZone {
 }
 
 impl OrderedZone {
-    fn cell_count(&self) -> usize{
-        (if self.i_max != 1 {
-            self.i_max - 1
-        } else{
-            1
-        } *
-        if self.j_max != 1{
-            self.j_max - 1
-        } else{
-            1
-        } *
-        if self.k_max != 1 {
-            self.k_max - 1
-        } else {
-            1
-        }) as _
+    fn cell_count(&self) -> usize {
+        (if self.i_max != 1 { self.i_max - 1 } else { 1 }
+            * if self.j_max != 1 { self.j_max - 1 } else { 1 }
+            * if self.k_max != 1 { self.k_max - 1 } else { 1 }) as _
     }
 }
 impl Zone for OrderedZone {
@@ -386,7 +345,7 @@ pub struct ClassicFEZone {
     pub var_types: Option<Vec<TecDataType>>,
 }
 
-impl ClassicFEZone{
+impl ClassicFEZone {
     pub fn num_connections(&self) -> usize {
         self.cells as usize * self.zone_type.num_nodes()
     }
@@ -402,14 +361,9 @@ pub trait Zone {
 }
 
 #[derive(Debug)]
-pub enum TecioError{
-    Other {
-        message: String,
-        code: i32,
-    },
-    FFIError {
-
-    },
+pub enum TecioError {
+    Other { message: String, code: i32 },
+    FFIError {},
     NulError(std::ffi::NulError),
     StringError(std::ffi::IntoStringError),
     WrongFileExtension,
@@ -423,7 +377,7 @@ impl From<PltParseError> for TecioError {
         TecioError::ParseError(t)
     }
 }
-impl From<nom::Err<PltParseError>> for TecioError{
+impl From<nom::Err<PltParseError>> for TecioError {
     fn from(e: nom::Err<PltParseError>) -> Self {
         Self::NomErr(e)
     }

@@ -1,32 +1,31 @@
 use libc::c_char;
 use std::{
-    convert::From,
-    ffi::{CString, OsStr, c_void},
-    ptr::null_mut,
-    path::Path,
-    fs::{File, read},
-    io::{Cursor, Read, BufRead},
     borrow::Cow,
+    convert::From,
+    ffi::{c_void, CString, OsStr},
+    fs::{read, File},
+    io::{BufRead, Cursor, Read},
+    mem::transmute,
+    path::Path,
+    ptr::null_mut,
 };
 
 use nom::{
-    IResult,
-    bytes::complete::{tag, take_while_m_n, take_while, take, *},
-    number::complete::{le_i32, be_u8, le_u32, le_f64, le_f32},
-    combinator::{map_res, not, opt, cond},
-    sequence::tuple,
-    multi::count,
+    bytes::complete::{tag, take, take_while, take_while_m_n, *},
+    character::is_alphabetic,
+    combinator::{cond, map_res, not, opt},
+    error::ErrorKind,
     error::ParseError,
+    multi::{count, fold_many0, many0, many1, many_till},
+    number::complete::{be_u8, le_f32, le_f64, le_i32, le_u32},
+    sequence::tuple,
+    IResult,
 };
 
-use crate::{ClassicFEZone, ValueLocation, common::{
-    try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType,
-}, FaceNeighborMode, FileType, TecData};
-use nom::error::ErrorKind;
-use nom::multi::{many0, many1, many_till, fold_many0};
-use nom::character::is_alphabetic;
-use widestring::MissingNulError;
-use nom::lib::std::mem::transmute;
+use crate::{
+    common::{try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType},
+    ClassicFEZone, FaceNeighborMode, FileType, TecData, ValueLocation,
+};
 
 const MIN_VERSION: i32 = 110;
 
@@ -35,7 +34,6 @@ pub enum PltParseError {
     HeaderVersionMissing,
     VersionMismatch { min: i32, current: i32 },
     Utf8Error,
-    Utf32Error,
     NotSupportedFeature,
     WrongHeaderTag,
     WrongDataTag,
@@ -53,13 +51,6 @@ impl ParseError<&[u8]> for PltParseError {
     }
 }
 
-impl From<widestring::MissingNulError<i32>> for PltParseError {
-    fn from(_: MissingNulError<i32>) -> Self {
-        Self::Utf32Error
-    }
-}
-
-
 #[derive(Clone, Debug)]
 pub struct PltFormat {
     version: i32,
@@ -75,21 +66,21 @@ impl PltFormat {
         let mut rest = data.as_slice();
 
         let (rest, t): (&[u8], &[u8]) = tag::<&str, &[u8], PltParseError>("#!TDV")(rest)?;
-        let (rest, version): (&[u8], _) = take(3u32)(rest).map(|(r, b)| (r, std::str::from_utf8(b).map(|n| n.parse::<i32>())))?;
+        let (rest, version): (&[u8], _) =
+            take(3u32)(rest).map(|(r, b)| (r, std::str::from_utf8(b).map(|n| n.parse::<i32>())))?;
         let version = match version {
             Ok(Ok(v)) => {
                 if v > MIN_VERSION {
                     v
                 } else {
-                    Err(VersionMismatch { min: MIN_VERSION, current: v })?
+                    Err(VersionMismatch {
+                        min: MIN_VERSION,
+                        current: v,
+                    })?
                 }
             }
-            Ok(Err(e)) => {
-                Err(PltParseError::Utf8Error)?
-            }
-            Err(err) => {
-                Err(PltParseError::Utf8Error)?
-            }
+            Ok(Err(e)) => Err(PltParseError::Utf8Error)?,
+            Err(err) => Err(PltParseError::Utf8Error)?,
         };
         let (rest, _) = is_number(1, rest)?;
         let (mut rest, file_type) = le_i32(rest).map(|(r, f)| (r, FileType::from(f)))?;
@@ -100,12 +91,13 @@ impl PltFormat {
         let (rest, t) = le_f32(rest)?;
         assert_eq!(t, 357.0f32);
 
-        let mut zones = header_blocks.into_iter().filter_map(|bl| {
-            match bl {
+        let mut zones = header_blocks
+            .into_iter()
+            .filter_map(|bl| match bl {
                 HeaderBlock::Zone(zone) => Some(zone),
                 _ => None,
-            }
-        }).collect::<Vec<_>>();
+            })
+            .collect::<Vec<_>>();
 
         let dataset = Dataset {
             num_variables: num_vars as _,
@@ -119,7 +111,7 @@ impl PltFormat {
             match z {
                 TecZone::Ordered(z) => z.id = i as i32 + 1,
                 TecZone::ClassicFE(z) => z.id = i as i32 + 1,
-                T_ => unimplemented!()
+                T_ => unimplemented!(),
             }
 
             let (r, bl) = parse_data_block(rest, num_vars, z)?;
@@ -128,18 +120,14 @@ impl PltFormat {
             data_blocks.push(bl);
         }
 
-
-        Ok(
-            PltFormat {
-                version,
-                dataset,
-                zones,
-                data_blocks,
-            }
-        )
+        Ok(PltFormat {
+            version,
+            dataset,
+            zones,
+            data_blocks,
+        })
     }
 }
-
 
 fn is_number(num: i32, input: &[u8]) -> IResult<&[u8], (), PltParseError> {
     le_i32(input).and_then(|(r, n)| {
@@ -201,44 +189,47 @@ fn parse_header_zone(input: &[u8], num_vars: i32) -> IResult<&[u8], TecZone, Plt
         (rest, FaceNeighborMode::LocalOneToOne, 0)
     };
 
-
     match zone_type {
         ZoneType::Ordered => {
-            let (rest, (i_max, j_max, k_max)) = do_parse!(rest,
-                i_max: le_i32 >> j_max: le_i32 >> k_max: le_i32 >>
-                ( (i_max, j_max, k_max ) )
+            let (rest, (i_max, j_max, k_max)) = do_parse!(
+                rest,
+                i_max: le_i32 >> j_max: le_i32 >> k_max: le_i32 >> ((i_max, j_max, k_max))
             )?;
 
-            let (rest, (aux_data, _)) = many_till(auxiliary_data, |input| is_number(0, input))(rest)?;
+            let (rest, (aux_data, _)) =
+                many_till(auxiliary_data, |input| is_number(0, input))(rest)?;
 
             Ok((
                 rest,
-                TecZone::Ordered(
-                    OrderedZone {
-                        name,
-                        id: strand_id,
-                        solution_time,
-                        strand: strand_id,
-                        i_max: i_max as i64,
-                        j_max: j_max as i64,
-                        k_max: k_max as i64,
-                        var_location,
-                        var_types: None,
-                    }
-                )
+                TecZone::Ordered(OrderedZone {
+                    name,
+                    id: strand_id,
+                    solution_time,
+                    strand: strand_id,
+                    i_max: i_max as i64,
+                    j_max: j_max as i64,
+                    k_max: k_max as i64,
+                    var_location,
+                    var_types: None,
+                }),
             ))
         }
-        ZoneType::FEBrick | ZoneType::FETetra | ZoneType::FEQuad | ZoneType::FETriangle | ZoneType::FELine => {
-            let (rest, (nodes, cells)) = do_parse!(rest,
-                num_ptr: le_i32 >> num_elements: le_i32 >>
-                ( (num_ptr, num_elements) )
+        ZoneType::FEBrick
+        | ZoneType::FETetra
+        | ZoneType::FEQuad
+        | ZoneType::FETriangle
+        | ZoneType::FELine => {
+            let (rest, (nodes, cells)) = do_parse!(
+                rest,
+                num_ptr: le_i32 >> num_elements: le_i32 >> ((num_ptr, num_elements))
             )?;
-            let (rest, (i_cell_dim, j_cell_dim, k_cell_dim)) = do_parse!(rest,
-                i_max: le_i32 >> j_max: le_i32 >> k_max: le_i32 >>
-                ( (i_max, j_max, k_max ) )
+            let (rest, (i_cell_dim, j_cell_dim, k_cell_dim)) = do_parse!(
+                rest,
+                i_max: le_i32 >> j_max: le_i32 >> k_max: le_i32 >> ((i_max, j_max, k_max))
             )?;
 
-            let (rest, (aux_data, _)) = many_till(auxiliary_data, |input| is_number(0, input))(rest)?;
+            let (rest, (aux_data, _)) =
+                many_till(auxiliary_data, |input| is_number(0, input))(rest)?;
 
             Ok((
                 rest,
@@ -252,12 +243,10 @@ fn parse_header_zone(input: &[u8], num_vars: i32) -> IResult<&[u8], TecZone, Plt
                     cells: cells as _,
                     var_location,
                     var_types: None,
-                })
+                }),
             ))
         }
-        _ => {
-            unimplemented!()
-        }
+        _ => unimplemented!(),
     }
 }
 
@@ -268,7 +257,6 @@ pub enum HeaderBlock {
     AuxVar(i32, String, String),
     Text,
     Geom,
-
 }
 
 fn parse_header_block(input: &[u8], num_vars: i32) -> IResult<&[u8], HeaderBlock, PltParseError> {
@@ -276,29 +264,21 @@ fn parse_header_block(input: &[u8], num_vars: i32) -> IResult<&[u8], HeaderBlock
     match splitter {
         299.0 => {
             let (rest, zone) = parse_header_zone(input, num_vars)?;
-            Ok((rest,
-                HeaderBlock::Zone(zone)
-            ))
+            Ok((rest, HeaderBlock::Zone(zone)))
         }
-        399.0 => {
-            unimplemented!()
-        }
+        399.0 => unimplemented!(),
         799.0 => {
             let (rest, data) = parse_dataset_aux(input)?;
-            Ok((rest,
-                HeaderBlock::AuxDataset(data.0, data.1)
-            ))
+            Ok((rest, HeaderBlock::AuxDataset(data.0, data.1)))
         }
         899.0 => {
             let (rest, data) = parse_var_aux(input)?;
-            Ok((rest,
-                HeaderBlock::AuxVar(data.0, data.1, data.2)
-            ))
+            Ok((rest, HeaderBlock::AuxVar(data.0, data.1, data.2)))
         }
         357.0 => {
             return Err(nom::Err::Error(PltParseError::EndOfHeader));
         }
-        p => panic!("Not implemented for block of type {:?}", p)
+        p => panic!("Not implemented for block of type {:?}", p),
     }
 }
 
@@ -315,12 +295,17 @@ impl DataBlock {
     }
 }
 
-fn parse_data_block<'a>(input: &'a [u8], num_vars: i32, zone: &mut TecZone) -> IResult<&'a [u8], DataBlock, PltParseError> {
+fn parse_data_block<'a>(
+    input: &'a [u8],
+    num_vars: i32,
+    zone: &mut TecZone,
+) -> IResult<&'a [u8], DataBlock, PltParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 299.0 {
         return Err(nom::Err::Error(PltParseError::WrongDataTag));
     }
-    let (rest, data_format): (_, Vec<TecDataType>) = count(le_i32, num_vars as _)(rest).map(|(r, v)| (r, unsafe { transmute(v) }))?;
+    let (rest, data_format): (_, Vec<TecDataType>) =
+        count(le_i32, num_vars as _)(rest).map(|(r, v)| (r, unsafe { transmute(v) }))?;
     let zone_data_types = zone.data_types_mut();
     *zone_data_types = Some(data_format);
     let (rest, has_passive) = le_i32(rest)?;
@@ -337,29 +322,25 @@ fn parse_data_block<'a>(input: &'a [u8], num_vars: i32, zone: &mut TecZone) -> I
     };
     let (rest, share_connectivity) = le_i32(rest)?;
     let (mut rest, min_max) = count(
-        |input: &[u8]| do_parse!(input,
-            min: le_f64 >> max: le_f64 >> ( (min, max ) )
-        ),
+        |input: &[u8]| do_parse!(input, min: le_f64 >> max: le_f64 >> ((min, max))),
         num_vars as usize,
     )(rest)?;
 
     let mut data = vec![];
 
-
-    for (n, (&loc, &format)) in zone.var_locs().iter().zip(zone.data_types().unwrap().iter()).enumerate() {
+    for (n, (&loc, &format)) in zone
+        .var_locs()
+        .iter()
+        .zip(zone.data_types().unwrap().iter())
+        .enumerate()
+    {
         let len = match loc {
-            ValueLocation::Nodal => {
-                zone.node_count()
-            }
-            ValueLocation::CellCentered => {
-                match &zone {
-                    TecZone::ClassicFE(z) => z.cells as _,
-                    TecZone::Ordered(z) => {
-                        (z.i_max * z.j_max * (z.k_max - 1)) as _
-                    }
-                    _ => unimplemented!()
-                }
-            }
+            ValueLocation::Nodal => zone.node_count(),
+            ValueLocation::CellCentered => match &zone {
+                TecZone::ClassicFE(z) => z.cells as _,
+                TecZone::Ordered(z) => (z.i_max * z.j_max * (z.k_max - 1)) as _,
+                _ => unimplemented!(),
+            },
         };
 
         let d = match format {
@@ -373,34 +354,36 @@ fn parse_data_block<'a>(input: &'a [u8], num_vars: i32, zone: &mut TecZone) -> I
                 rest = r;
                 TecData::F32(Cow::Owned(d))
             }
-            _ => unimplemented!()
+            _ => unimplemented!(),
         };
 
-        let d = match &zone{
+        let d = match &zone {
             TecZone::Ordered(z) => {
-                match loc{
+                match loc {
                     ValueLocation::CellCentered => {
                         match d {
                             TecData::F64(Cow::Owned(v)) => {
                                 let mut out = Vec::with_capacity(zone.cell_count());
                                 //TODO! Optimize!
-                                for k in 0..z.k_max - 1{
-                                    for j in 0..z.j_max -1{
-                                        for i in 0..z.i_max-1 {
-                                            let ind = (i + j * (z.i_max ) + k * (z.i_max ) * (z.j_max )) as usize;
+                                for k in 0..z.k_max - 1 {
+                                    for j in 0..z.j_max - 1 {
+                                        for i in 0..z.i_max - 1 {
+                                            let ind =
+                                                (i + j * (z.i_max) + k * (z.i_max) * (z.j_max))
+                                                    as usize;
                                             out.push(v[ind]);
                                         }
                                     }
                                 }
                                 TecData::F64(Cow::Owned(out))
-                            },
-                            _ => unimplemented!()
+                            }
+                            _ => unimplemented!(),
                         }
-                    },
+                    }
                     _ => d,
                 }
-            },
-            _ => d
+            }
+            _ => d,
         };
 
         data.push((n, d));
@@ -425,9 +408,8 @@ fn parse_data_block<'a>(input: &'a [u8], num_vars: i32, zone: &mut TecZone) -> I
                 unimplemented!()
             }
         }
-        _ => unimplemented!()
+        _ => unimplemented!(),
     };
-
 
     Ok((
         rest,
@@ -435,10 +417,9 @@ fn parse_data_block<'a>(input: &'a [u8], num_vars: i32, zone: &mut TecZone) -> I
             data,
             connectivity,
             min_max,
-        }
+        },
     ))
 }
-
 
 fn parse_geom(input: &[u8]) -> IResult<&[u8], (), PltParseError> {
     let (rest, t) = le_f32(input)?;
@@ -490,21 +471,27 @@ fn parse_var_aux(input: &[u8]) -> IResult<&[u8], (i32, String, String), PltParse
     if t != 899.0 {
         return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
     }
-    let (rest, data) = do_parse!(rest,
-            var_num: le_i32 >> name: parse_utf8_null_terminated >> format: le_i32 >> value: parse_utf8_null_terminated >>
-            ( (var_num, name, value ))
-        )?;
+    let (rest, data) = do_parse!(
+        rest,
+        var_num: le_i32
+            >> name: parse_utf8_null_terminated
+            >> format: le_i32
+            >> value: parse_utf8_null_terminated
+            >> ((var_num, name, value))
+    )?;
     Ok((rest, data))
 }
 
 fn auxiliary_data(input: &[u8]) -> IResult<&[u8], (String, String), PltParseError> {
-    let (rest, (name, format, value)) = do_parse!(input,
-            name: parse_utf8_null_terminated >> format: le_i32 >> value: parse_utf8_null_terminated >>
-            ( (name, format, value ))
-        )?;
+    let (rest, (name, format, value)) = do_parse!(
+        input,
+        name: parse_utf8_null_terminated
+            >> format: le_i32
+            >> value: parse_utf8_null_terminated
+            >> ((name, format, value))
+    )?;
     Ok((rest, (name, value)))
 }
-
 
 #[cfg(test)]
 mod tests {
