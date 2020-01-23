@@ -86,6 +86,8 @@ pub enum TecData<'a> {
     I32(Cow<'a, [i32]>),
     I16(Cow<'a, [i16]>),
     I8(Cow<'a, [i8]>),
+    U64(Cow<'a, [u64]>),
+    U32(Cow<'a, [u32]>),
 }
 
 impl<'a> TecData<'a> {
@@ -121,9 +123,71 @@ impl<'a> TecData<'a> {
             I32(c) => c.len(),
             I16(c) => c.len(),
             I8(c) => c.len(),
+            U64(c) => c.len(),
+            U32(c) => c.len(),
+        }
+    }
+    pub fn as_f32(&self) -> Vec<f32>{
+        match self{
+            TecData::F32(ref cow) => {
+                cow.clone().into_owned()
+            },
+            TecData::F64(ref cow) => {
+                cow.iter().map(|v| *v as f32).collect()
+            }
+            _ => unimplemented!(),
+        }
+    }
+
+    pub fn as_i32(&self) -> Vec<i32>{
+        match self{
+            TecData::I32(ref cow) => {
+                cow.clone().into_owned()
+            },
+            _ => unimplemented!(),
         }
     }
 }
+
+macro_rules! borrowed_impl {
+    ($ty: tt, $var: tt) => {
+        impl<'a> From<&'a [$ty]> for TecData<'a>{
+            fn from(s: &'a [$ty]) -> Self {
+                Self::$var(Cow::Borrowed(s))
+            }
+        }
+    }
+}
+macro_rules! owned_impl {
+    ($ty: tt, $var: tt) => {
+        impl From<Vec<$ty>> for TecData<'static>{
+            fn from(s: Vec<$ty>) -> Self {
+                Self::$var(Cow::Owned(s))
+            }
+        }
+    }
+}
+
+macro_rules! both_impl {
+    ($ty: tt, $var: tt) => {
+        borrowed_impl!($ty, $var);
+        owned_impl!($ty, $var);
+    }
+}
+
+
+both_impl!(f64, F64);
+both_impl!(f32, F32);
+both_impl!(i64, I64);
+both_impl!(i32, I32);
+both_impl!(i16, I16);
+both_impl!(i8 , I8 );
+both_impl!(u64, U64);
+both_impl!(u32, U32);
+
+
+
+
 
 #[derive(Debug, Copy, Clone)]
 #[repr(i32)]
@@ -164,8 +228,18 @@ impl FileType {
 #[derive(Debug, Copy, Clone)]
 #[repr(i32)]
 pub enum ValueLocation {
-    Nodal = 0,
-    CellCentered = 1,
+    CellCentered = 0,
+    Nodal = 1,
+}
+
+impl From<i32> for ValueLocation{
+    fn from(i: i32) -> Self {
+        match i {
+            0 => Self::CellCentered,
+            1 => Self::Nodal,
+            _ => unreachable!()
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone)]

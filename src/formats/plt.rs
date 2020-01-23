@@ -27,6 +27,7 @@ use crate::{
     ClassicFEZone, FaceNeighborMode, FileType, TecData, ValueLocation,
 };
 
+
 const MIN_VERSION: i32 = 110;
 
 #[derive(Debug, Copy, Clone)]
@@ -170,7 +171,14 @@ fn parse_header_zone(input: &[u8], num_vars: i32) -> IResult<&[u8], TecZone, Plt
     let (rest, zone_type) = le_i32(rest).map(|(r, z)| (r, ZoneType::from(z)))?;
     let (rest, specify_var_loc) = le_i32(rest)?;
     let (rest, var_location) = if specify_var_loc == 1 {
-        count(le_i32, num_vars as usize)(rest).map(|(r, v)| (r, unsafe { transmute(v) }))?
+        count(le_i32, num_vars as usize)(rest)
+            .map(|(r, v)|
+                (
+                    r,
+                    v.into_iter().map(|v| ValueLocation::from(1 - v )).collect::<Vec<_>>()
+                )
+
+            )?
     } else {
         (rest, vec![ValueLocation::Nodal; num_vars as usize])
     };
@@ -499,14 +507,20 @@ mod tests {
 
     #[test]
     fn simple_test() {
-        let f = PltFormat::open(r".\tests\heat.plt");
-        assert!(f.is_ok());
         let f = PltFormat::open(r".\tests\heated_fin.plt");
+
+
+
         if let Ok(format) = f {
+            println!("{:?}", format.zones);
             println!("Min max: {:?}", format.data_blocks[2].min_max);
             let xi = &format.data_blocks[2].data[3].1;
             println!("xi: {:?}", xi);
+        }else{
+           println!("{:?}", f);
+           assert!(false);
         }
-        //assert!(f.is_ok());
+
+
     }
 }

@@ -269,8 +269,8 @@ pub struct TecZoneWriter<'a> {
 }
 
 impl<'a> TecZoneWriter<'a> {
-    pub fn write_data(&mut self, var: i32, data: &TecData) -> Result<()> {
-        match data {
+    pub fn write_data<'d, T: Into<TecData<'d>>>(&mut self, var: i32, data: T) -> Result<()> {
+        match data.into() {
             TecData::F32(data) => {
                 try_err(
                     unsafe {
@@ -315,9 +315,9 @@ impl<'a> TecZoneWriter<'a> {
         }
     }
 
-    pub fn write_nodemap(&mut self, nodemap: &TecData, one_based: bool) -> Result<()> {
+    pub fn write_nodemap<'b, T: Into<TecData<'b>>>(&mut self, nodemap: T, one_based: bool) -> Result<()> {
         match self.zone {
-            TecZone::ClassicFE(_) => match nodemap {
+            TecZone::ClassicFE(_) => match nodemap.into() {
                 TecData::I32(data) => {
                     try_err(
                         unsafe {
@@ -374,4 +374,43 @@ impl<'a> TecZoneWriter<'a> {
         }
         Ok(())
     }
+}
+
+
+#[cfg(test)]
+mod tests{
+    use super::{TecWriter, TecZoneWriter};
+    use crate::*;
+
+    #[test]
+    fn simple_write(){
+        let xi = vec![0.0, 1.0, 0.0];
+        let yi = vec![0.0, 0.0, 1.0];
+        let zi = vec![0.0, 0.0, 0.0];
+        let pi = vec![1e3];
+        let map: Vec<i32> = vec![0, 1, 2];
+
+        let config = WriterConfig::default()
+            .diagnostics_level(1);
+        let mut writer: TecWriter = TecWriter::create("./tests/simple_write.szplt", "Test dataset", "X Y Z P", 4, &config).unwrap();
+        let mut zone = writer.add_zone(
+            TecZone::ClassicFE(ClassicFEZone{
+                name: "123".to_string(),
+                zone_type: ZoneType::FETriangle,
+                id: 1,
+                solution_time: 2.0,
+                strand: 1,
+                nodes: 3,
+                cells: 1,
+                var_location: vec![ValueLocation::Nodal, ValueLocation::Nodal, ValueLocation::Nodal, ValueLocation::CellCentered, ],
+                var_types: Some(vec![TecDataType::F64, TecDataType::F64,TecDataType::F64, TecDataType::F64,])
+            })
+        ).unwrap();
+        zone.write_data(1, xi);
+        zone.write_data(2, yi);
+        zone.write_data(3, zi);
+        zone.write_data(4, pi);
+        zone.write_nodemap(map, false);
+    }
+
 }

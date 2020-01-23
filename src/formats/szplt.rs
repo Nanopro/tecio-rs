@@ -167,7 +167,7 @@ impl SzpltFormat {
                     | ZoneType::FEBrick
                     | ZoneType::FELine
                     | ZoneType::FETetra => {
-                        assert_eq!(k_max, 0);
+
                         TecZone::ClassicFE(ClassicFEZone {
                             name: zone_name,
                             zone_type: zone_type,
