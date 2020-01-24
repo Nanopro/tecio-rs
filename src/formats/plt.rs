@@ -15,7 +15,6 @@ use nom::{
     character::is_alphabetic,
     combinator::{cond, map_res, not, opt},
     error::ErrorKind,
-    error::ParseError,
     multi::{count, fold_many0, many0, many1, many_till},
     number::complete::{be_u8, le_f32, le_f64, le_i32, le_u32},
     sequence::tuple,
@@ -23,34 +22,13 @@ use nom::{
 };
 
 use crate::{
-    common::{try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType},
+    common::{try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType, ParseError},
     ClassicFEZone, FaceNeighborMode, FileType, TecData, ValueLocation,
 };
 
-
 const MIN_VERSION: i32 = 110;
 
-#[derive(Debug, Copy, Clone)]
-pub enum PltParseError {
-    HeaderVersionMissing,
-    VersionMismatch { min: i32, current: i32 },
-    Utf8Error,
-    NotSupportedFeature,
-    WrongHeaderTag,
-    WrongDataTag,
-    EndOfHeader,
-}
 
-impl ParseError<&[u8]> for PltParseError {
-    fn from_error_kind(input: &[u8], kind: ErrorKind) -> Self {
-        println!("{:?} {:?}", input, kind);
-        unimplemented!()
-    }
-
-    fn append(input: &[u8], kind: ErrorKind, other: Self) -> Self {
-        unimplemented!()
-    }
-}
 
 #[derive(Clone, Debug)]
 pub struct PltFormat {
@@ -62,13 +40,13 @@ pub struct PltFormat {
 
 impl PltFormat {
     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
-        use PltParseError::*;
+        use ParseError::*;
         let data = read(path)?;
         let mut rest = data.as_slice();
 
-        let (rest, t): (&[u8], &[u8]) = tag::<&str, &[u8], PltParseError>("#!TDV")(rest)?;
+        let (rest, t): (&[u8], &[u8]) = tag::<&str, &[u8], ParseError>("#!TDV")(rest)?;
         let (rest, version): (&[u8], _) =
-            take(3u32)(rest).map(|(r, b)| (r, std::str::from_utf8(b).map(|n| n.parse::<i32>())))?;
+            take::<_, _, ParseError>(3u32)(rest).map(|(r, b)| (r, std::str::from_utf8(b).map(|n| n.parse::<i32>())))?;
         let version = match version {
             Ok(Ok(v)) => {
                 if v > MIN_VERSION {
@@ -80,8 +58,8 @@ impl PltFormat {
                     })?
                 }
             }
-            Ok(Err(e)) => Err(PltParseError::Utf8Error)?,
-            Err(err) => Err(PltParseError::Utf8Error)?,
+            Ok(Err(e)) => Err(ParseError::Utf8Error)?,
+            Err(err) => Err(ParseError::Utf8Error)?,
         };
         let (rest, _) = is_number(1, rest)?;
         let (mut rest, file_type) = le_i32(rest).map(|(r, f)| (r, FileType::from(f)))?;
@@ -130,17 +108,17 @@ impl PltFormat {
     }
 }
 
-fn is_number(num: i32, input: &[u8]) -> IResult<&[u8], (), PltParseError> {
+fn is_number(num: i32, input: &[u8]) -> IResult<&[u8], (), ParseError> {
     le_i32(input).and_then(|(r, n)| {
         if n == num {
             Ok((r, ()))
         } else {
-            Err(nom::Err::Error(PltParseError::Utf8Error))
+            Err(nom::Err::Error(ParseError::Utf8Error))
         }
     })
 }
 
-fn parse_utf8_null_terminated(mut input: &[u8]) -> IResult<&[u8], String, PltParseError> {
+fn parse_utf8_null_terminated(mut input: &[u8]) -> IResult<&[u8], String, ParseError> {
     let mut title = vec![];
     let (rest, _) = loop {
         let (r, i) = le_u32(input)?;
@@ -155,15 +133,15 @@ fn parse_utf8_null_terminated(mut input: &[u8]) -> IResult<&[u8], String, PltPar
     Ok((rest, s))
 }
 
-fn parse_header_zone(input: &[u8], num_vars: i32) -> IResult<&[u8], TecZone, PltParseError> {
+fn parse_header_zone(input: &[u8], num_vars: i32) -> IResult<&[u8], TecZone, ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 299.0 {
-        return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
+        return Err(nom::Err::Error(ParseError::WrongHeaderTag));
     }
     let (rest, name) = parse_utf8_null_terminated(rest)?;
     let (rest, parent_zone) = le_i32(rest)?;
     if parent_zone != -1 {
-        return Err(nom::Err::Error(PltParseError::NotSupportedFeature));
+        return Err(nom::Err::Error(ParseError::NotSupportedFeature));
     }
     let (rest, strand_id) = le_i32(rest)?;
     let (rest, solution_time) = le_f64(rest)?;
@@ -171,14 +149,14 @@ fn parse_header_zone(input: &[u8], num_vars: i32) -> IResult<&[u8], TecZone, Plt
     let (rest, zone_type) = le_i32(rest).map(|(r, z)| (r, ZoneType::from(z)))?;
     let (rest, specify_var_loc) = le_i32(rest)?;
     let (rest, var_location) = if specify_var_loc == 1 {
-        count(le_i32, num_vars as usize)(rest)
-            .map(|(r, v)|
-                (
-                    r,
-                    v.into_iter().map(|v| ValueLocation::from(1 - v )).collect::<Vec<_>>()
-                )
-
-            )?
+        count(le_i32, num_vars as usize)(rest).map(|(r, v)| {
+            (
+                r,
+                v.into_iter()
+                    .map(|v| ValueLocation::from(1 - v))
+                    .collect::<Vec<_>>(),
+            )
+        })?
     } else {
         (rest, vec![ValueLocation::Nodal; num_vars as usize])
     };
@@ -267,7 +245,7 @@ pub enum HeaderBlock {
     Geom,
 }
 
-fn parse_header_block(input: &[u8], num_vars: i32) -> IResult<&[u8], HeaderBlock, PltParseError> {
+fn parse_header_block(input: &[u8], num_vars: i32) -> IResult<&[u8], HeaderBlock, ParseError> {
     let (rest, splitter) = le_f32(input)?;
     match splitter {
         299.0 => {
@@ -284,7 +262,7 @@ fn parse_header_block(input: &[u8], num_vars: i32) -> IResult<&[u8], HeaderBlock
             Ok((rest, HeaderBlock::AuxVar(data.0, data.1, data.2)))
         }
         357.0 => {
-            return Err(nom::Err::Error(PltParseError::EndOfHeader));
+            return Err(nom::Err::Error(ParseError::EndOfHeader));
         }
         p => panic!("Not implemented for block of type {:?}", p),
     }
@@ -307,10 +285,10 @@ fn parse_data_block<'a>(
     input: &'a [u8],
     num_vars: i32,
     zone: &mut TecZone,
-) -> IResult<&'a [u8], DataBlock, PltParseError> {
+) -> IResult<&'a [u8], DataBlock, ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 299.0 {
-        return Err(nom::Err::Error(PltParseError::WrongDataTag));
+        return Err(nom::Err::Error(ParseError::WrongDataTag));
     }
     let (rest, data_format): (_, Vec<TecDataType>) =
         count(le_i32, num_vars as _)(rest).map(|(r, v)| (r, unsafe { transmute(v) }))?;
@@ -429,55 +407,55 @@ fn parse_data_block<'a>(
     ))
 }
 
-fn parse_geom(input: &[u8]) -> IResult<&[u8], (), PltParseError> {
+fn parse_geom(input: &[u8]) -> IResult<&[u8], (), ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 399.0 {
-        return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
+        return Err(nom::Err::Error(ParseError::WrongHeaderTag));
     }
 
     unimplemented!()
 }
 
-fn parse_text(input: &[u8]) -> IResult<&[u8], (), PltParseError> {
+fn parse_text(input: &[u8]) -> IResult<&[u8], (), ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 499.0 {
-        return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
+        return Err(nom::Err::Error(ParseError::WrongHeaderTag));
     }
 
     unimplemented!()
 }
 
-fn parse_custom_label(input: &[u8]) -> IResult<&[u8], (), PltParseError> {
+fn parse_custom_label(input: &[u8]) -> IResult<&[u8], (), ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 599.0 {
-        return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
+        return Err(nom::Err::Error(ParseError::WrongHeaderTag));
     }
 
     unimplemented!()
 }
 
-fn parse_user_recs(input: &[u8]) -> IResult<&[u8], (), PltParseError> {
+fn parse_user_recs(input: &[u8]) -> IResult<&[u8], (), ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 699.0 {
-        return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
+        return Err(nom::Err::Error(ParseError::WrongHeaderTag));
     }
 
     unimplemented!()
 }
 
-fn parse_dataset_aux(input: &[u8]) -> IResult<&[u8], (String, String), PltParseError> {
+fn parse_dataset_aux(input: &[u8]) -> IResult<&[u8], (String, String), ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 799.0 {
-        return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
+        return Err(nom::Err::Error(ParseError::WrongHeaderTag));
     }
     let (rest, aux_data) = auxiliary_data(rest)?;
     Ok((rest, aux_data))
 }
 
-fn parse_var_aux(input: &[u8]) -> IResult<&[u8], (i32, String, String), PltParseError> {
+fn parse_var_aux(input: &[u8]) -> IResult<&[u8], (i32, String, String), ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 899.0 {
-        return Err(nom::Err::Error(PltParseError::WrongHeaderTag));
+        return Err(nom::Err::Error(ParseError::WrongHeaderTag));
     }
     let (rest, data) = do_parse!(
         rest,
@@ -490,7 +468,7 @@ fn parse_var_aux(input: &[u8]) -> IResult<&[u8], (i32, String, String), PltParse
     Ok((rest, data))
 }
 
-fn auxiliary_data(input: &[u8]) -> IResult<&[u8], (String, String), PltParseError> {
+fn auxiliary_data(input: &[u8]) -> IResult<&[u8], (String, String), ParseError> {
     let (rest, (name, format, value)) = do_parse!(
         input,
         name: parse_utf8_null_terminated
@@ -509,18 +487,14 @@ mod tests {
     fn simple_test() {
         let f = PltFormat::open(r".\tests\heated_fin.plt");
 
-
-
         if let Ok(format) = f {
             println!("{:?}", format.zones);
             println!("Min max: {:?}", format.data_blocks[2].min_max);
             let xi = &format.data_blocks[2].data[3].1;
             println!("xi: {:?}", xi);
-        }else{
-           println!("{:?}", f);
-           assert!(false);
+        } else {
+            println!("{:?}", f);
+            assert!(false);
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-use crate::{PltParseError, TecReader};
+use crate::{ TecReader};
 use libc::c_char;
 use std::{
     borrow::Cow,
@@ -434,6 +434,42 @@ pub trait Zone {
     fn time(&self) -> f64;
 }
 
+
+#[derive(Debug, Copy, Clone)]
+pub enum ParseError {
+    HeaderVersionMissing,
+    VersionMismatch { min: i32, current: i32 },
+    Utf8Error,
+    NotSupportedFeature,
+    WrongHeaderTag,
+    WrongDataTag,
+    EndOfHeader,
+    NomError(nom::error::ErrorKind),
+}
+
+impl nom::error::ParseError<&[u8]> for ParseError {
+    fn from_error_kind(input: &[u8], kind: nom::error::ErrorKind) -> Self {
+        println!("{:?} {:?}", input, kind);
+        unimplemented!()
+    }
+
+    fn append(input: &[u8], kind: nom::error::ErrorKind, other: Self) -> Self {
+        unimplemented!()
+    }
+}
+
+impl nom::error::ParseError<&str> for ParseError {
+    fn from_error_kind(input: &str, kind: nom::error::ErrorKind) -> Self {
+        //println!("{:?} {:?}", kind, input);
+        ParseError::NomError(kind)
+    }
+
+    fn append(input: &str, kind: nom::error::ErrorKind, other: Self) -> Self {
+        unimplemented!()
+    }
+}
+
+
 #[derive(Debug)]
 pub enum TecioError {
     Other { message: String, code: i32 },
@@ -442,17 +478,17 @@ pub enum TecioError {
     StringError(std::ffi::IntoStringError),
     WrongFileExtension,
     IOError(std::io::Error),
-    ParseError(PltParseError),
-    NomErr(nom::Err<PltParseError>),
+    ParseError(ParseError),
+    NomErr(nom::Err<ParseError>),
 }
 
-impl From<PltParseError> for TecioError {
-    fn from(t: PltParseError) -> Self {
+impl From<ParseError> for TecioError {
+    fn from(t: ParseError) -> Self {
         TecioError::ParseError(t)
     }
 }
-impl From<nom::Err<PltParseError>> for TecioError {
-    fn from(e: nom::Err<PltParseError>) -> Self {
+impl From<nom::Err<ParseError>> for TecioError {
+    fn from(e: nom::Err<ParseError>) -> Self {
         Self::NomErr(e)
     }
 }
