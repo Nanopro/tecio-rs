@@ -24,7 +24,7 @@ use crate::{
     common::{try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType, ParseError},
     ClassicFEZone, FaceNeighborMode, FileType, TecData, ValueLocation,
 };
-use nom::bytes::complete::is_not;
+use nom::bytes::complete::{is_not, take_till};
 use nom::character::complete::{anychar, line_ending, space1, space0};
 use nom::sequence::terminated;
 use nom::multi::separated_list;
@@ -80,7 +80,7 @@ enum KeyWord {
 enum Values<'a> {
     String(&'a str),
     StringList(Vec<&'a str>),
-    Location(Vec<(Vec<i32>, ValueLocation)>),
+    Location(Vec<(Vec<&'a str>, &'a str)>),
     Number(f64),
 }
 
@@ -186,11 +186,21 @@ fn number(input: &str) -> IResult<&str, f64, ParseError> {
 fn value(input: &str) -> IResult<&str, &str, ParseError> {
     alphanumeric1(input)
 }
-
+fn separ_comma(input: &str) -> IResult<&str, (), ParseError> {
+    let (r, _) = do_parse!(input,
+                  space0
+          >>     char!(',')
+          >>      space0
+          >>
+        ( () )
+     )?;
+    Ok((r, ()))
+}
 fn separ(input: &str) -> IResult<&str, (), ParseError> {
     let (r, _) = do_parse!(input,
-                  multispace0
+                  space0
           >>      opt!(char!(','))
+          >>       opt!(multispace0)
           >>      opt!(line_ending)
           >>
         ( () )
@@ -205,14 +215,15 @@ fn var_location(input: &str) -> IResult<&str, Values, ParseError>{
 
         fn pattern(input: &str) -> IResult<&str, Vec<&str>, ParseError>{
             fn var_specifier(input: &str) -> IResult<&str, &str, ParseError>{
-                alphanumeric1(input)
+                take_while::<_, &str, ParseError>(|c: char| c.is_numeric() || c == '-')(input)
             }
+            println!("{:?}", &input[0..5]);
             let (r, v) = delimited(
                 tag("["),
-                separated_list(tag(","), var_specifier),
+                separated_list(separ_comma, var_specifier),
                 tag("]"),
-            )(input)?;
-
+            )(input).unwrap();
+            println!("{:?}", v);
             Ok((r, v))
         }
         do_parse!(input,
@@ -220,7 +231,8 @@ fn var_location(input: &str) -> IResult<&str, Values, ParseError>{
               >>      multispace0
               >>      char!('=')
               >>      multispace0
-             >> val: value >>
+             >> val: value
+             >>      multispace0 >>
             ( (pat, val) )
       )
     }
@@ -234,9 +246,7 @@ fn var_location(input: &str) -> IResult<&str, Values, ParseError>{
         tag(")"),
     )(input)?;
 
-    println!("{:#?}", v);
-
-    unimplemented!()
+    Ok((r, Values::Location(v)))
 }
 
 
@@ -277,7 +287,7 @@ fn keyword_parser(keyword: KeyWord, input: &str) -> IResult<&str, Values, ParseE
             Ok((r, Values::StringList(v)))
         }
         VarLocation => {
-            let (r, v) = var_location(input).unwrap();
+            let (r, v) = var_location(input)?;
 
             Ok((r, v))
         }
