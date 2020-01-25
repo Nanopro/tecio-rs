@@ -15,7 +15,7 @@ use nom::{
     },
     combinator::{cond, map_res, not, opt},
     multi::{count, fold_many0, many0, many1, many_till},
-    number::complete::{be_u8, le_f32, le_f64, le_i32, le_u32, double},
+    number::complete::{be_u8, le_f32, le_f64, le_i32, le_u32, double, float, recognize_float},
     sequence::{tuple, separated_pair, delimited},
     IResult,
 };
@@ -46,7 +46,13 @@ pub(crate) struct DataBlock {
     pub(crate) min_max: Vec<(f64, f64)>,
 }
 
-#[derive(Debug, Copy, Clone)]
+impl DataBlock {
+    pub fn get_data(&self, var_id: usize) -> TecData {
+        self.data[var_id].1.get()
+    }
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 enum KeyWord {
     Title,
     FileType,
@@ -86,7 +92,6 @@ enum Values<'a> {
 
 fn keyword(input: &str) -> IResult<&str, KeyWord, ParseError> {
     let (rest, word) = alphanumeric1(input)?;
-    println!("Word: {}", word);
     match word {
         "TITLE" => {
             Ok((rest, KeyWord::Title))
@@ -166,6 +171,7 @@ fn keyword(input: &str) -> IResult<&str, KeyWord, ParseError> {
         "AUXDATA" => {
             Ok((rest, KeyWord::AuxData))
         }
+
         _ => {
             Err(nom::Err::Error(ParseError::WrongHeaderTag))
         }
@@ -190,6 +196,7 @@ fn separ_comma(input: &str) -> IResult<&str, (), ParseError> {
     let (r, _) = do_parse!(input,
                   space0
           >>     char!(',')
+          >> opt!(line_ending)
           >>      space0
           >>
         ( () )
@@ -200,13 +207,14 @@ fn separ(input: &str) -> IResult<&str, (), ParseError> {
     let (r, _) = do_parse!(input,
                   space0
           >>      opt!(char!(','))
-          >>       opt!(multispace0)
+          >>       opt!(space0)
           >>      opt!(line_ending)
           >>
         ( () )
      )?;
     Ok((r, ()))
 }
+
 
 
 fn var_location(input: &str) -> IResult<&str, Values, ParseError>{
@@ -217,16 +225,16 @@ fn var_location(input: &str) -> IResult<&str, Values, ParseError>{
             fn var_specifier(input: &str) -> IResult<&str, &str, ParseError>{
                 take_while::<_, &str, ParseError>(|c: char| c.is_numeric() || c == '-')(input)
             }
-            println!("{:?}", &input[0..5]);
+
             let (r, v) = delimited(
                 tag("["),
                 separated_list(separ_comma, var_specifier),
                 tag("]"),
             )(input).unwrap();
-            println!("{:?}", v);
+
             Ok((r, v))
         }
-        do_parse!(input,
+        let (r, v) = do_parse!(input,
              pat: pattern
               >>      multispace0
               >>      char!('=')
@@ -234,17 +242,19 @@ fn var_location(input: &str) -> IResult<&str, Values, ParseError>{
              >> val: value
              >>      multispace0 >>
             ( (pat, val) )
-      )
+      )?;
+
+        Ok((r, v))
     }
 
     let (r, v) = delimited(
         tag("("),
         separated_list(
-            separ,
+            separ_comma,
             sp1
         ),
         tag(")"),
-    )(input)?;
+    )(input).unwrap();
 
     Ok((r, Values::Location(v)))
 }
@@ -365,12 +375,246 @@ fn parse_header(input: &str) -> IResult<&str, DatHeader, ParseError> {
 
     Ok((rest, header))
 }
+use std::collections::HashMap;
 
-fn parse_data(input: &str) -> IResult<&str, ZoneRecord, ParseError> {
+
+fn resolve_var_location(var_loc: &[(Vec<& str>, &str)], var_num: usize) -> Vec<ValueLocation>{
+    let mut locations = vec![ValueLocation::Nodal; var_num];
+
+    var_loc.iter().for_each(|(patterns, location)|{
+       let location = match *location{
+            "CELLCENTERED" => ValueLocation::CellCentered,
+            "NODAL" => ValueLocation::Nodal,
+           x => panic!("Unknown value location: {:?}", x)
+       };
+
+        patterns.iter().for_each(|&pattern| {
+            if pattern.contains("-") {
+                let mut sp = pattern.split("-");
+                let first: usize = sp.next().unwrap().parse().expect("Bad number!");
+                let last: usize = sp.next().unwrap().parse().expect("Bad number!");
+                if last > first && first > 0 && last <= var_num{
+                    for i in first..=last{
+                        locations[i] = location;
+                    }
+                }else{
+                    panic!("Var location num outside of var num count!")
+                }
+            } else {
+                //2
+                let num = pattern.parse::<usize>().expect("Bad number for zone location");
+                if num <= var_num {
+                    locations[num-1] = location;
+                } else{
+                    panic!("Var location num outside of var num count!")
+                }
+            }
+        })
+
+
+    });
+    locations
+}
+fn float_sep(input: &str) -> IResult<&str, (), ParseError> {
+    do_parse!(input,
+                  space0
+          >>      opt!(line_ending)
+          >> space0
+          >>
+        ( () )
+     )
+}
+
+fn float_with_separ(input: &str) -> IResult<&str, &str, ParseError>{
+    do_parse!(input,
+            opt!(float_sep) >>
+        f: recognize_float >>
+        float_sep >>
+        ( f )
+    )
+}
+
+fn parse_zone(input: &str, var_num: usize) -> IResult<&str, (TecZone, DataBlock), ParseError> {
     let (rest, tag) = tag("ZONE")(input)?;
     let (rest, values) = many0(terminated(key_value, separ))(rest)?;
+    let values: HashMap<KeyWord, Values> = values.into_iter().collect();
     println!("{:#?}", values);
-    unimplemented!()
+
+    let zonetype = values.get(&KeyWord::ZoneType).map(|t| {
+        match t{
+            Values::String(t) => {
+                match t.to_lowercase().as_str() {
+                    "ordered" => ZoneType::Ordered,
+                    "felineseg" => ZoneType::FEPolygon,
+                    "fetriangle" => ZoneType::FETriangle,
+                    "fequadrilateral" => ZoneType::FEQuad,
+                    "fetetrahedron" => ZoneType::FETetra,
+                    "febrick" => ZoneType::FEBrick,
+                    "fepolygon" => ZoneType::FEPolygon,
+                    "fepolyhedral" => ZoneType::FEPolyhedron,
+                    x => panic!("Unknown zone type: {:?}!", x)
+                }
+            },
+            x => panic!("Unknown zone type: {:?}!", x)
+        }
+    }).unwrap_or(ZoneType::Ordered);
+
+    let get_number = |key| values.get(&key).map(|v|{
+        match v{
+            Values::Number(n) => *n,
+            x => panic!("Expected number, got {:?}", x)
+        }
+    }).unwrap_or(1.0);
+
+    let zone_title = values.get(&KeyWord::T).map(|x| match x{
+        Values::String(name) => (*name).to_owned(),
+        _ => unimplemented!()
+    }).unwrap_or_else(|| format!("Unnamed zone"));
+    let solution_time = get_number(KeyWord::SolutionTime);
+    let strand_id = get_number(KeyWord::StrandId) as _;
+    let var_location = values.get(&KeyWord::VarLocation).map(|v|{
+        match v{
+            Values::Location(l) => resolve_var_location(l.as_slice(), var_num),
+            x => panic!("Expected list of var locations, got: {:?}!", x)
+        }
+    }).unwrap_or_else(||vec![ValueLocation::Nodal; var_num]);
+
+    let var_types = values.get(&KeyWord::DT).map(|v| {
+        match v{
+            Values::StringList(list) => {
+                list.iter().map(|n| match *n {
+                    "SINGLE" => TecDataType::F32,
+                    "DOUBLE" => TecDataType::F64,
+                    x => panic!("Expected var type, got: {:?}!", x)
+                }).collect()
+            },
+            x => panic!("Expected list of var types, got: {:?}!", x)
+        }
+    }).unwrap_or_else(|| vec![TecDataType::F64; var_num]);
+
+    let zone = match zonetype{
+        ZoneType::Ordered => {
+
+
+            let i_max = get_number(KeyWord::I) as i64;
+            let j_max = get_number(KeyWord::J) as i64;
+            let k_max = get_number(KeyWord::K) as i64;
+
+
+
+
+
+
+
+
+
+            let zone = TecZone::Ordered(OrderedZone{
+                name: zone_title,
+                id: 0,
+                solution_time,
+                strand: strand_id,
+                i_max,
+                j_max,
+                k_max,
+                var_location,
+                var_types: Some(var_types),
+            });
+
+
+           zone
+        },
+        ZoneType::FEBrick
+        | ZoneType::FETetra
+        | ZoneType::FEQuad
+        | ZoneType::FETriangle
+        | ZoneType::FELine => {
+            let cells = get_number(KeyWord::Elements) as i64;
+            let nodes = get_number(KeyWord::Nodes) as i64;
+
+            TecZone::ClassicFE(ClassicFEZone{
+                name: zone_title,
+                zone_type: zonetype,
+                id: 0,
+                solution_time,
+                strand: strand_id,
+                nodes,
+                cells,
+                var_location,
+                var_types: Some(var_types),
+            })
+
+        },
+        _ => unimplemented!()
+    };
+    let mut rest = rest;
+    let mut data = Vec::with_capacity(var_num);
+    let min_max = vec![(0.0, 0.0); var_num];
+
+
+
+    for (num, (loc, ty)) in zone.var_locs().iter().zip(zone.data_types().unwrap().iter()).enumerate(){
+        let c = match loc{
+            ValueLocation::Nodal => {
+                zone.node_count()
+            },
+            ValueLocation::CellCentered => {
+                zone.cell_count()
+            }
+        };
+
+        let (r, _) = float_sep(rest)?;
+        rest = r;
+
+        let (r, x) = count(float_with_separ, c)(rest)?;
+
+        rest = r;
+        let d = match ty{
+            TecDataType::F32 => {
+                TecData::from(
+                    x.into_iter().map(|p| p.parse::<f32>().unwrap()).collect::<Vec<_>>()
+                )
+            },
+            TecDataType::F64 => {
+                TecData::from(
+                    x.into_iter().map(|p| p.parse::<f64>().unwrap()).collect::<Vec<_>>()
+                )
+            },
+            TecDataType::I32 => {
+                TecData::from(
+                    x.into_iter().map(|p| p.parse::<i32>().unwrap()).collect::<Vec<_>>()
+                )
+            },
+            TecDataType::I16 => {
+                TecData::from(
+                    x.into_iter().map(|p| p.parse::<i16>().unwrap()).collect::<Vec<_>>()
+                )
+            },
+            _ => unimplemented!()
+        };
+        data.push((num + 1, d));
+    }
+
+    let connectivity = match &zone{
+        TecZone::ClassicFE(fe) => {
+            let (r, v) = count(float_with_separ, fe.num_connections())(rest)?;
+            rest = r;
+            Some(TecData::from(
+                v.into_iter().map(|p| p.parse::<i32>().unwrap()).collect::<Vec<_>>()
+            ))
+        },
+        _ => None
+    };
+
+
+
+
+    let block = DataBlock{
+        data,
+        connectivity,
+        min_max
+    };
+    Ok((rest, (zone, block)))
+
 }
 
 
@@ -380,13 +624,30 @@ impl DatFormat {
         let rest = file.as_str();
 
 
-        let (rest, c) = parse_header(rest)?;
-        println!("{:#?}", c);
-        let (rest, c) = parse_data(rest)?;
-        println!("{:#?}", c);
+        let (rest, header) = parse_header(rest)?;
+        //println!("{:#?}", c);
+        let (rest, z) = many0(|rest| parse_zone(rest, header.var_list.len()))(rest)?;
 
 
-        unimplemented!()
+        let dataset = Dataset{
+            num_variables: header.var_list.len() as _,
+            num_zones: z.len() as _,
+            title: header.title,
+            var_names: header.var_list
+        };
+        let mut zones = Vec::with_capacity(z.len());
+        let mut data_blocks = Vec::with_capacity(z.len());
+         z.into_iter().for_each(|(zone, block)|{
+            zones.push(zone);
+            data_blocks.push(block);
+        });
+        Ok(
+            Self{
+                dataset,
+                zones,
+                data_blocks
+            }
+        )
     }
 }
 
@@ -397,20 +658,8 @@ pub struct DatHeader {
     var_list: Vec<String>,
 }
 
-#[derive(Debug, Clone)]
-struct ZoneRecord {
-    header: ZoneHeader,
-    data: DataBlock,
-    footer: ZoneFooter,
-}
 
-#[derive(Debug, Clone)]
-struct ZoneHeader {
-    title: String
-}
 
-#[derive(Debug, Clone)]
-struct ZoneFooter {}
 
 
 #[cfg(test)]
@@ -419,8 +668,12 @@ mod tests {
 
     #[test]
     fn simple_test() {
-        let r = DatFormat::open("./tests/heated_fin.dat");
+        let r = DatFormat::open("./tests/ice.dat");
         assert!(r.is_ok());
+        if let Ok(r) = r {
+            let c = &r.data_blocks[0].connectivity;
+            println!("{:?}", c);
+        }
     }
 }
 

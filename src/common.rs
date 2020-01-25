@@ -139,6 +139,18 @@ impl<'a> TecData<'a> {
         }
     }
 
+    pub fn as_f64(&self) -> Vec<f64>{
+        match self{
+            TecData::F32(ref cow) => {
+                cow.iter().map(|v| *v as f64).collect()
+            },
+            TecData::F64(ref cow) => {
+                cow.clone().into_owned()
+            }
+            _ => unimplemented!(),
+        }
+    }
+
     pub fn as_i32(&self) -> Vec<i32>{
         match self{
             TecData::I32(ref cow) => {
@@ -465,7 +477,7 @@ impl nom::error::ParseError<&str> for ParseError {
     }
 
     fn append(input: &str, kind: nom::error::ErrorKind, other: Self) -> Self {
-        unimplemented!()
+        ParseError::NomError(kind)
     }
 }
 
