@@ -371,7 +371,7 @@ fn parse_header(input: &str) -> IResult<&str, DatHeader, ParseError> {
         match key {
             KeyWord::Variables => {
                 match value {
-                    Values::StringList(s) => Some(s.iter().map(|&s| s.to_owned()).collect()),
+                    Values::StringList(s) => Some(s.iter().map(|&s| format!("\"{}\"", s)).collect()),
                     _ => None,
                 }
             }
@@ -437,11 +437,20 @@ fn float_sep(input: &str) -> IResult<&str, (), ParseError> {
         ( () )
      )
 }
+fn weird_float(input: &str) -> IResult<&str, &str, ParseError>{
+    take_while::<_, &str, ParseError>(|c: char|
+        c == 'E' ||
+        c == '-' ||
+        c == '+' ||
+        c == '.' ||
+        c.is_digit(10)
+    )(input)
+}
 
 fn float_with_separ(input: &str) -> IResult<&str, &str, ParseError> {
     do_parse!(input,
             opt!(float_sep) >>
-        f: recognize_float >>
+        f: weird_float >>
         float_sep >>
         ( f )
     )
@@ -635,7 +644,12 @@ fn parse_zone(input: &str, var_num: usize) -> IResult<&str, (TecZone, DataBlock)
                         TecDataType::F32 => {
                            match &mut data[num].1 {
                                TecData::F32(Cow::Owned(v)) => {
-                                   v.push(d.parse().unwrap());
+                                   if d.starts_with("-."){
+                                       let (_, digits) = d.split_at(2);
+                                       v.push(format!("-0.{}", digits).parse().unwrap());
+                                   }else{
+                                       v.push(d.parse().unwrap());
+                                   }
                                }
                                _ => unreachable!()
                            }
@@ -643,7 +657,20 @@ fn parse_zone(input: &str, var_num: usize) -> IResult<&str, (TecZone, DataBlock)
                         TecDataType::F64 => {
                             match &mut data[num].1 {
                                 TecData::F64(Cow::Owned(v)) => {
-                                    v.push(d.parse().unwrap());
+                                    if d.starts_with("-."){
+                                        let (_, digits) = d.split_at(2);
+                                        let s = format!("-0.{}", digits);
+                                        match s.parse(){
+                                            Ok(s) => v.push(s),
+                                            _ => v.push(0.0),
+                                        }
+                                    }else{
+                                        match d.parse(){
+                                            Ok(x) => v.push(x),
+                                            Err(_) => v.push(0.0),
+                                        }
+                                    }
+
                                 },
                                 _ => unreachable!()
                             }
@@ -697,7 +724,12 @@ impl DatFormat {
         };
         let mut zones = Vec::with_capacity(z.len());
         let mut data_blocks = Vec::with_capacity(z.len());
-        z.into_iter().for_each(|(zone, block)| {
+        z.into_iter().enumerate().for_each(|(id, (mut zone, block))| {
+            match &mut zone{
+                TecZone::Ordered(o) => o.id = id as i32 + 1,
+                TecZone::ClassicFE(o) => o.id = id as i32 + 1,
+                _ => unimplemented!()
+            }
             zones.push(zone);
             data_blocks.push(block);
         });
