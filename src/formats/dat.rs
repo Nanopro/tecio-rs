@@ -466,7 +466,7 @@ fn parse_zone(input: &str, var_num: usize) -> IResult<&str, (TecZone, DataBlock)
             Values::String(t) => {
                 match t.to_lowercase().as_str() {
                     "ordered" => ZoneType::Ordered,
-                    "felineseg" => ZoneType::FEPolygon,
+                    "felineseg" => ZoneType::FELine,
                     "fetriangle" => ZoneType::FETriangle,
                     "fequadrilateral" => ZoneType::FEQuad,
                     "fetetrahedron" => ZoneType::FETetra,
