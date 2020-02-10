@@ -29,7 +29,7 @@ impl TecReader {
     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
         let path = path.as_ref();
         let inner = match path.extension().map(|os| os.to_str().unwrap_or("")) {
-            Some("szplt") => {
+            Some("szplt")  | Some("szplt_geom")=> {
                 let path = path.to_str().unwrap();
                 InnerReader::SzpltReader(SzpltFormat::open(path)?)
             }
