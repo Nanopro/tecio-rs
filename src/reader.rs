@@ -41,6 +41,13 @@ impl TecReader {
         Ok(Self { inner })
     }
 
+    pub fn tecio<P: AsRef<Path>>(path: P) -> Result<Self>{
+        let path = path.to_str().unwrap();
+        Ok(Self{
+            inner: InnerReader::SzpltReader(SzpltFormat::open(path)?)
+        })
+    }
+
     pub fn dataset(&self) -> &Dataset {
         match &self.inner {
             InnerReader::SzpltReader(szplt) => &szplt.dataset,
