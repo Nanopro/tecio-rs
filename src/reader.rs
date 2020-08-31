@@ -42,7 +42,7 @@ impl TecReader {
     }
 
     pub fn tecio<P: AsRef<Path>>(path: P) -> Result<Self>{
-        let path = path.to_str().unwrap();
+        let path = path.as_ref().to_str().unwrap();
         Ok(Self{
             inner: InnerReader::SzpltReader(SzpltFormat::open(path)?)
         })
