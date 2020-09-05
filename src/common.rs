@@ -7,6 +7,7 @@ use std::{
     marker::PhantomData,
     ptr::null_mut,
 };
+use thiserror::{Error};
 
 pub type Result<T> = std::result::Result<T, TecioError>;
 
@@ -447,15 +448,23 @@ pub trait Zone {
 }
 
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Error)]
 pub enum ParseError {
+    #[error("Header Version Missing")]
     HeaderVersionMissing,
+    #[error("Version mismatch (minimum: {min}, current: {current})")]
     VersionMismatch { min: i32, current: i32 },
+    #[error("Utf8 Error")]
     Utf8Error,
+    #[error("Unsupported Feature")]
     NotSupportedFeature,
+    #[error("Wrong Header Tag")]
     WrongHeaderTag,
+    #[error("Wrong data tag")]
     WrongDataTag,
+    #[error("Unexpected end of header")]
     EndOfHeader,
+    #[error("Nom Error of kind: {}", .0.description())]
     NomError(nom::error::ErrorKind),
 }
 
@@ -482,43 +491,22 @@ impl nom::error::ParseError<&str> for ParseError {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum TecioError {
+    #[error("{message} (code {code}).")]
     Other { message: String, code: i32 },
+    #[error("FFI Error occured")]
     FFIError {},
-    NulError(std::ffi::NulError),
-    StringError(std::ffi::IntoStringError),
+    #[error("Null Error: {0}")]
+    NulError(#[from] std::ffi::NulError),
+    #[error("StringError: {0}")]
+    StringError(#[from] std::ffi::IntoStringError),
+    #[error("Wrong file extension, expected one of: `szplt`, `plt`, `dat`")]
     WrongFileExtension,
-    IOError(std::io::Error),
-    ParseError(ParseError),
-    NomErr(nom::Err<ParseError>),
-}
-
-impl From<ParseError> for TecioError {
-    fn from(t: ParseError) -> Self {
-        TecioError::ParseError(t)
-    }
-}
-impl From<nom::Err<ParseError>> for TecioError {
-    fn from(e: nom::Err<ParseError>) -> Self {
-        Self::NomErr(e)
-    }
-}
-
-impl From<std::io::Error> for TecioError {
-    fn from(t: std::io::Error) -> Self {
-        TecioError::IOError(t)
-    }
-}
-
-impl From<std::ffi::NulError> for TecioError {
-    fn from(t: std::ffi::NulError) -> Self {
-        TecioError::NulError(t)
-    }
-}
-
-impl From<std::ffi::IntoStringError> for TecioError {
-    fn from(t: std::ffi::IntoStringError) -> Self {
-        TecioError::StringError(t)
-    }
+    #[error(transparent)]
+    IOError(#[from] std::io::Error),
+    #[error("Error during parsing: {0}")]
+    ParseError(#[from] ParseError),
+    #[error("Nom Error: {0}")]
+    NomErr(#[from] nom::Err<ParseError>),
 }

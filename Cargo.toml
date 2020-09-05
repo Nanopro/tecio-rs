@@ -1,6 +1,6 @@
 [package]
 name = "tecio"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["Nanopro <nanopro1g@gmail.com>"]
 edition = "2018"
 description = "Rust simple binding for Tecplot tecio library."
@@ -10,7 +10,7 @@ build = "build/build.rs"
 [dependencies]
 libc = "0.2.51"
 nom = "5.1"
-
+thiserror="1"
 
 [build-dependencies.cmake]
 version = "0.1.42"
