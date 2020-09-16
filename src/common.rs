@@ -354,6 +354,13 @@ impl TecZone {
             _ => unimplemented!(),
         }
     }
+    pub fn solution_time(&self) -> f64{
+        match self{
+            TecZone::Ordered(z) => z.solution_time,
+            TecZone::ClassicFE(z) => z.solution_time,
+            _ => unimplemented!()
+        }
+    }
     pub fn node_count(&self) -> usize {
         match self {
             TecZone::Ordered(z) => (z.i_max * z.j_max * z.k_max) as _,
@@ -384,6 +391,22 @@ impl TecZone {
     }
 }
 
+impl Zone for TecZone {
+    fn id(&self) -> i32 {
+        match self{
+            TecZone::Ordered(z) => z.id(),
+            TecZone::ClassicFE(z) => z.id(),
+            _ => unimplemented!()
+        }
+    }
+    fn time(&self) -> f64 {
+        self.solution_time()
+    }
+    fn name(&self) -> &str {
+        self.name()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct OrderedZone {
     pub name: String,
@@ -396,6 +419,7 @@ pub struct OrderedZone {
     pub k_max: i64,
     pub var_location: Vec<ValueLocation>,
     pub var_types: Option<Vec<TecDataType>>,
+    pub passive_var_list: Vec<i32>,
 }
 
 impl OrderedZone {
@@ -435,6 +459,18 @@ pub struct ClassicFEZone {
 impl ClassicFEZone {
     pub fn num_connections(&self) -> usize {
         self.cells as usize * self.zone_type.num_nodes()
+    }
+}
+
+impl Zone for ClassicFEZone {
+    fn id(&self) -> i32 {
+        self.id
+    }
+    fn time(&self) -> f64 {
+        self.solution_time
+    }
+    fn name(&self) -> &str {
+        &self.name
     }
 }
 

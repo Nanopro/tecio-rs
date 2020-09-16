@@ -11,6 +11,8 @@ build = "build/build.rs"
 libc = "0.2.51"
 nom = "5.1"
 thiserror="1"
+vmap = "0.3"
+
 
 [build-dependencies.cmake]
 version = "0.1.42"

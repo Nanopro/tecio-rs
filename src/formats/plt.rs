@@ -10,16 +10,7 @@ use std::{
     ptr::null_mut,
 };
 
-use nom::{
-    bytes::complete::{tag, take, take_while, take_while_m_n, *},
-    character::is_alphabetic,
-    combinator::{cond, map_res, not, opt},
-    error::ErrorKind,
-    multi::{count, fold_many0, many0, many1, many_till},
-    number::complete::{be_u8, le_f32, le_f64, le_i32, le_u32},
-    sequence::tuple,
-    IResult,
-};
+use nom::{bytes::complete::{tag, take, take_while, take_while_m_n, *}, character::is_alphabetic, combinator::{cond, map_res, not, opt}, error::ErrorKind, multi::{count, fold_many0, many0, many1, many_till}, number::complete::{be_u8, le_f32, le_f64, le_i32, le_u32}, sequence::tuple, IResult, AsBytes};
 
 use crate::{
     common::{try_err, Dataset, OrderedZone, Result, TecDataType, TecZone, TecioError, ZoneType, ParseError},
@@ -31,18 +22,19 @@ const MIN_VERSION: i32 = 110;
 
 
 #[derive(Clone, Debug)]
-pub struct PltFormat {
+pub struct PltFormat<'a> {
     version: i32,
     pub dataset: Dataset,
     pub zones: Vec<TecZone>,
-    pub(crate) data_blocks: Vec<DataBlock>,
+    pub(crate) data_blocks: Vec<DataBlock<'a>>,
 }
 
-impl PltFormat {
+impl PltFormat<'static>{
     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
         use ParseError::*;
-        let data = read(path)?;
-        let mut rest = data.as_slice();
+        let data = vmap::Map::open(path)?;
+        let data = unsafe{ std::slice::from_raw_parts(data.as_ptr(), data.len()) };
+        let mut rest = data;
 
         let (rest, t): (&[u8], &[u8]) = tag::<&str, &[u8], ParseError>("#!TDV")(rest)?;
         let (rest, version): (&[u8], _) =
@@ -93,7 +85,7 @@ impl PltFormat {
                 T_ => unimplemented!(),
             }
 
-            let (r, bl) = parse_data_block(rest, num_vars, z)?;
+            let (r, bl) = parse_data_block(rest, num_vars, z, true)?;
 
             rest = r;
             data_blocks.push(bl);
@@ -105,6 +97,80 @@ impl PltFormat {
             zones,
             data_blocks,
         })
+    }
+}
+
+impl<'a> PltFormat<'a> {
+    pub fn read(data: &'a [u8]) -> Result<Self> {
+        use ParseError::*;
+
+        let mut rest = data;
+
+        let (rest, t): (&[u8], &[u8]) = tag::<&str, &[u8], ParseError>("#!TDV")(rest)?;
+        let (rest, version): (&[u8], _) =
+            take::<_, _, ParseError>(3u32)(rest).map(|(r, b)| (r, std::str::from_utf8(b).map(|n| n.parse::<i32>())))?;
+        let version = match version {
+            Ok(Ok(v)) => {
+                if v > MIN_VERSION {
+                    v
+                } else {
+                    Err(VersionMismatch {
+                        min: MIN_VERSION,
+                        current: v,
+                    })?
+                }
+            }
+            Ok(Err(e)) => Err(ParseError::Utf8Error)?,
+            Err(err) => Err(ParseError::Utf8Error)?,
+        };
+        let (rest, _) = is_number(1, rest)?;
+        let (mut rest, file_type) = le_i32(rest).map(|(r, f)| (r, FileType::from(f)))?;
+        let (rest, title) = parse_utf8_null_terminated(rest)?;
+        let (rest, num_vars) = le_i32(rest)?;
+        let (rest, var_names) = count(parse_utf8_null_terminated, num_vars as usize)(rest)?;
+        let (rest, header_blocks) = many0(|input| parse_header_block(input, num_vars))(rest)?;
+        let (rest, t) = le_f32(rest)?;
+        assert_eq!(t, 357.0f32);
+
+        let mut zones = header_blocks
+            .into_iter()
+            .filter_map(|bl| match bl {
+                HeaderBlock::Zone(zone) => Some(zone),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+
+        let dataset = Dataset {
+            num_variables: num_vars as _,
+            num_zones: zones.len() as _,
+            title,
+            var_names,
+        };
+        let mut rest = rest;
+        let mut data_blocks = vec![];
+        for (i, z) in zones.iter_mut().enumerate() {
+            match z {
+                TecZone::Ordered(z) => z.id = i as i32 + 1,
+                TecZone::ClassicFE(z) => z.id = i as i32 + 1,
+                T_ => unimplemented!(),
+            }
+
+            let (r, bl) = parse_data_block(rest, num_vars, z, false)?;
+
+            rest = r;
+            data_blocks.push(bl);
+        }
+
+        Ok(PltFormat {
+            version,
+            dataset,
+            zones,
+            data_blocks,
+        })
+    }
+
+    pub fn get_data(&'a self, zone: usize, var: usize) -> Result<TecData<'a>>{
+        Ok(self.data_blocks[zone - 1].get_data(var - 1))
     }
 }
 
@@ -197,6 +263,7 @@ fn parse_header_zone(input: &[u8], num_vars: i32) -> IResult<&[u8], TecZone, Par
                     k_max: k_max as i64,
                     var_location,
                     var_types: None,
+                    passive_var_list: vec![0; num_vars as usize],
                 }),
             ))
         }
@@ -269,14 +336,14 @@ fn parse_header_block(input: &[u8], num_vars: i32) -> IResult<&[u8], HeaderBlock
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct DataBlock {
-    pub(crate) data: Vec<(usize, TecData<'static>)>,
-    pub(crate) connectivity: Option<TecData<'static>>,
+pub(crate) struct DataBlock<'a> {
+    pub(crate) data: Vec<(usize, TecData<'a>)>,
+    pub(crate) connectivity: Option<TecData<'a>>,
     pub(crate) min_max: Vec<(f64, f64)>,
 }
 
-impl DataBlock {
-    pub fn get_data(&self, var_id: usize) -> TecData {
+impl<'a> DataBlock<'a> {
+    pub fn get_data(&'a self, var_id: usize) -> TecData<'a> {
         self.data[var_id].1.get()
     }
 }
@@ -285,7 +352,8 @@ fn parse_data_block<'a>(
     input: &'a [u8],
     num_vars: i32,
     zone: &mut TecZone,
-) -> IResult<&'a [u8], DataBlock, ParseError> {
+    copy: bool,
+) -> IResult<&'a [u8], DataBlock<'a>, ParseError> {
     let (rest, t) = le_f32(input)?;
     if t != 299.0 {
         return Err(nom::Err::Error(ParseError::WrongDataTag));
@@ -296,10 +364,20 @@ fn parse_data_block<'a>(
     *zone_data_types = Some(data_format);
     let (rest, has_passive) = le_i32(rest)?;
     let (rest, passive_list): (_, Vec<i32>) = if has_passive != 0 {
-        unimplemented!()
+        count(le_i32, num_vars as _)(rest)?
     } else {
-        (rest, vec![])
+        (rest, vec![0; num_vars as usize])
     };
+
+    if has_passive != 0{
+        match zone{
+            TecZone::Ordered(o) => o.passive_var_list = passive_list.clone(),
+            _ => unimplemented!(),
+        }
+    }
+
+
+    //println!("{:?}, {:?}", passive_list, zone.zone_type());
     let (rest, has_share) = le_i32(rest)?;
     let (rest, share_list): (_, Vec<i32>) = if has_share != 0 {
         unimplemented!()
@@ -307,9 +385,10 @@ fn parse_data_block<'a>(
         (rest, vec![])
     };
     let (rest, share_connectivity) = le_i32(rest)?;
+    let non_shared_non_passive = num_vars - passive_list.iter().fold(0, |x, y| x + *y);
     let (mut rest, min_max) = count(
         |input: &[u8]| do_parse!(input, min: le_f64 >> max: le_f64 >> ((min, max))),
-        num_vars as usize,
+        non_shared_non_passive as usize,
     )(rest)?;
 
     let mut data = vec![];
@@ -320,6 +399,11 @@ fn parse_data_block<'a>(
         .zip(zone.data_types().unwrap().iter())
         .enumerate()
     {
+        if passive_list.get(n) == Some(&1) {
+            data.push((n, TecData::F32(Cow::Owned(vec![]))));
+            continue;
+        }
+
         let len = match loc {
             ValueLocation::Nodal => zone.node_count(),
             ValueLocation::CellCentered => match &zone {
@@ -331,14 +415,23 @@ fn parse_data_block<'a>(
 
         let d = match format {
             TecDataType::F64 => {
+
                 let (r, d) = count(le_f64, len)(rest)?;
                 rest = r;
                 TecData::F64(Cow::Owned(d))
             }
             TecDataType::F32 => {
-                let (r, d) = count(le_f32, len)(rest)?;
-                rest = r;
-                TecData::F32(Cow::Owned(d))
+                if copy {
+                    let (r, d) = count(le_f32, len)(rest)?;
+                    rest = r;
+                    TecData::F32(Cow::Owned(d))
+                } else{
+                    let d = unsafe{ std::slice::from_raw_parts(rest.as_ptr() as *const f32, len) };
+                    rest = &rest[len * 4..];
+                    TecData::F32(Cow::Borrowed(d))
+                }
+
+
             }
             _ => unimplemented!(),
         };
@@ -349,6 +442,7 @@ fn parse_data_block<'a>(
                     ValueLocation::CellCentered => {
                         match d {
                             TecData::F64(Cow::Owned(v)) => {
+                                println!("Here");
                                 let mut out = Vec::with_capacity(zone.cell_count());
                                 //TODO! Optimize!
                                 for k in 0..z.k_max - 1 {

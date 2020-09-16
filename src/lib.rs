@@ -11,6 +11,6 @@ extern crate nom;
 extern crate libc;
 
 pub use common::*;
-pub(crate) use formats::{PltFormat, SzpltFormat, DatFormat };
+pub use formats::{PltFormat, SzpltFormat, DatFormat };
 pub use reader::TecReader;
 pub use writer::{TecWriter, TecZoneWriter, WriterConfig};

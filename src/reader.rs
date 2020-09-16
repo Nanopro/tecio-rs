@@ -20,7 +20,7 @@ pub struct TecReader {
 }
 
 pub enum InnerReader {
-    PltReader(PltFormat),
+    PltReader(PltFormat<'static>),
     SzpltReader(SzpltFormat),
     DatReader(DatFormat),
 }

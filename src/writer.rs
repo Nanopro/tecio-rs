@@ -45,15 +45,17 @@ impl WriterConfig {
 }
 
 impl TecWriter {
-    pub fn create<T>(
+    pub fn create<T, U, V>(
         file: T,
-        dataset_title: T,
-        var_list: T,
+        dataset_title: U,
+        var_list: V,
         num_vars: usize,
         config: &WriterConfig,
     ) -> Result<Self>
     where
         T: AsRef<[u8]>,
+        U: AsRef<[u8]>,
+        V: AsRef<[u8]>,
     {
         let cname = CString::new(file.as_ref())?;
         let dataset_title = CString::new(dataset_title.as_ref())?;
@@ -140,7 +142,7 @@ impl TecWriter {
                                 .unwrap_or(null()),
                             array_of_nulls.as_ptr(),
                             zone.var_location.as_ptr() as *const _,
-                            array_of_nulls.as_ptr(),
+                            zone.passive_var_list.as_ptr(),
                             0,
                             0,
                             FaceNeighborMode::GlobalOneToMany as i32,

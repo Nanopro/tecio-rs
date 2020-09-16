@@ -545,6 +545,7 @@ fn parse_zone(input: &str, var_num: usize) -> IResult<&str, (TecZone, DataBlock)
                 k_max,
                 var_location,
                 var_types: Some(var_types),
+                passive_var_list: vec![0; var_num]
             });
 
 

@@ -148,6 +148,21 @@ impl SzpltFormat {
                         format!("Error reading zone locations"),
                     )?;
                 }
+                let mut passive = vec![0; num_vars as usize];
+                for (v, passive) in passive.iter_mut().enumerate(){
+                    try_err(
+                        bindings::tecZoneVarIsPassive(
+                            file_handle,
+                            i,
+                            v as i32 + 1,
+                            passive as *mut i32,
+                        ),
+                        format!("Error reading passive vars"),
+                    )?;
+                }
+
+
+
 
                 let zone = match zone_type {
                     ZoneType::Ordered => TecZone::Ordered(OrderedZone {
@@ -161,6 +176,7 @@ impl SzpltFormat {
 
                         var_location: locs,
                         var_types: None,
+                        passive_var_list: passive,
                     }),
                     ZoneType::FEQuad
                     | ZoneType::FETriangle
