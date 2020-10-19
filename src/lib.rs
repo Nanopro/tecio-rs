@@ -1,4 +1,4 @@
-mod bindings;
+pub mod bindings;
 mod common;
 mod formats;
 mod reader;

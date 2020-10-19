@@ -545,4 +545,6 @@ pub enum TecioError {
     ParseError(#[from] ParseError),
     #[error("Nom Error: {0}")]
     NomErr(#[from] nom::Err<ParseError>),
+    #[error("VMAP Error: {0}")]
+    VmapError(#[from] vmap::Error),
 }
